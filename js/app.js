@@ -373,9 +373,16 @@ function closeHabitModal() {
  * Submit habit form
  */
 function submitHabitForm() {
+  // Clear previous errors
+  clearFormErrors();
+
+  const durationValue = document.getElementById('duration-value').value.trim();
+  const durationUnit = document.getElementById('duration-unit').value.trim();
+  const duration = (durationValue && durationUnit) ? `${durationValue} ${durationUnit}` : '';
+
   const formData = {
     name: document.getElementById('habit-name').value.trim(),
-    duration: document.getElementById('duration-value').value || document.getElementById('duration-unit').value,
+    duration: duration,
     frequencyTarget: document.getElementById('frequency-target').value,
     frequencyPeriod: document.getElementById('frequency-period').value,
     reminderEnabled: document.getElementById('reminder-toggle').checked,
@@ -390,8 +397,8 @@ function submitHabitForm() {
     return;
   }
 
-  if (!formData.frequencyTarget) {
-    showFormError('frequency-error', 'Frequency is required');
+  if (!formData.frequencyTarget || formData.frequencyTarget < 1) {
+    showFormError('frequency-error', 'Frequency must be at least 1');
     return;
   }
 
@@ -437,6 +444,16 @@ function showFormError(elementId, message) {
   if (errorEl) {
     errorEl.textContent = message;
   }
+}
+
+/**
+ * Clear all form validation errors
+ */
+function clearFormErrors() {
+  const errorElements = document.querySelectorAll('.form-error');
+  errorElements.forEach(el => {
+    el.textContent = '';
+  });
 }
 
 // ========== CONFIRMATION DIALOG ==========
