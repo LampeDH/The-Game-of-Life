@@ -204,25 +204,34 @@ function renderHabitDetail(habitId) {
   const calendarView = document.getElementById('calendar-view');
   if (calendarView) {
     calendarView.innerHTML = '<div class="week-view">' + weekDays
-      .map(day => `
-        <div class="calendar-day">
-          <div class="day-name">${day.name}</div>
-          <div class="day-number">${day.date.split('-')[2]}</div>
-          <div class="day-indicator ${day.completed ? 'completed' : ''}"></div>
-        </div>
-      `).join('') + '</div>';
+      .map(day => {
+        const isEditable = canEditDate(day.date) && !day.isDisabled;
+        const editableClass = isEditable ? 'editable' : 'disabled';
+        return `
+          <div class="calendar-day ${editableClass}" data-date="${day.date}">
+            <div class="day-name">${day.name}</div>
+            <div class="day-number">${day.date.split('-')[2]}</div>
+            <div class="day-indicator ${day.completed ? 'completed' : ''}"></div>
+          </div>
+        `;
+      }).join('') + '</div>';
 
-    // Add click handlers for editable dates
+    // Add click handlers for editable dates (7-day window)
     const dayElements = calendarView.querySelectorAll('.calendar-day');
-    dayElements.forEach((el, index) => {
-      const day = weekDays[index];
-      if (canEditDate(day.date) && !day.isDisabled) {
+    dayElements.forEach((el) => {
+      const dateStr = el.dataset.date;
+      const isEditable = canEditDate(dateStr) && !el.classList.contains('disabled');
+
+      if (isEditable) {
         el.style.cursor = 'pointer';
         el.addEventListener('click', () => {
-          toggleHabitCompletion(habitId, day.date);
+          toggleHabitCompletion(habitId, dateStr);
           renderHabitDetail(habitId);
           renderHabits();
         });
+      } else {
+        el.style.cursor = 'not-allowed';
+        el.style.opacity = '0.5';
       }
     });
   }
