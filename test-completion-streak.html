@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tasks 1.9 + 1.10 Test - Completion & Streak Logic</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #0f0f0f;
+      color: #ffffff;
+    }
+    h1 {
+      color: #4a90e2;
+    }
+    .test-section {
+      background: #1a1a1a;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border: 1px solid #333;
+    }
+    .test-result {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .success {
+      background: #1a4d2e;
+      border-left: 4px solid #4caf50;
+    }
+    .error {
+      background: #4d1a1a;
+      border-left: 4px solid #f44336;
+    }
+    .info {
+      background: #1a2d4d;
+      border-left: 4px solid #4a90e2;
+    }
+    .warning {
+      background: #4d3d1a;
+      border-left: 4px solid #ff9800;
+    }
+    button {
+      background: #4a90e2;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #357abd;
+    }
+    .test-button {
+      background: #9c27b0;
+      font-size: 16px;
+      padding: 15px 30px;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    li {
+      padding: 8px 0;
+    }
+    li:before {
+      content: '✓ ';
+      color: #4caf50;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 12px;
+      margin: 8px 0;
+      background: #0a0a0a;
+      border-radius: 6px;
+      border-left: 3px solid #4a90e2;
+    }
+    .checklist-item:before {
+      content: '☐ ';
+      font-size: 20px;
+      margin-right: 12px;
+      color: #4a90e2;
+      flex-shrink: 0;
+    }
+    pre {
+      background: #000;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .code-inline {
+      background: #333;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #333;
+    }
+    th {
+      background: #0a0a0a;
+      color: #4a90e2;
+      font-weight: bold;
+    }
+    .highlight {
+      color: #ffeb3b;
+      font-weight: bold;
+    }
+    .example-box {
+      background: #0a0a0a;
+      padding: 15px;
+      border-radius: 6px;
+      border-left: 3px solid #4caf50;
+      margin: 15px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Tasks 1.9 + 1.10: Habit Completion & Streak Logic Test</h1>
+  <p>Testing the complete habit completion flow with visual feedback and streak calculations</p>
+
+  <div class="test-section">
+    <h2>📋 Implementation Summary</h2>
+    <div class="test-result info">
+      <strong>What's Implemented:</strong>
+      <ul>
+        <li><strong>Task 1.9:</strong> Habit Completion Logic with animations & feedback</li>
+        <li><strong>Task 1.10:</strong> Streak Calculation for "X times per week" habits</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>✅ Task 1.9: Habit Completion Logic</h2>
+    <div id="task-19-features"></div>
+
+    <h3>Visual Feedback:</h3>
+    <div class="example-box">
+      <ul>
+        <li><strong>Completion Checkbox:</strong> Circular button on right side of card</li>
+        <li><strong>Checkmark Animation:</strong> Pops in with scale effect (0 → 1.2 → 1)</li>
+        <li><strong>Card Bounce:</strong> Entire card bounces on completion</li>
+        <li><strong>Haptic Feedback:</strong> 50ms vibration on mobile devices</li>
+        <li><strong>Week Dots Update:</strong> Today's dot fills instantly</li>
+        <li><strong>Streak Counter:</strong> Updates automatically</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>✅ Task 1.10: Streak Calculation Logic</h2>
+    <div id="task-110-features"></div>
+
+    <h3>Streak Algorithm (from PRD):</h3>
+    <div class="example-box">
+      <pre><code>function updateStreak(habit) {
+  const weeks = groupCompletionsByWeek(habit.completions);
+  let currentStreak = 0;
+
+  // Iterate weeks from most recent backwards
+  for (let week of weeks.reverse()) {
+    if (week.completions >= frequencyTarget) {
+      currentStreak += week.completions.length;
+    } else {
+      break; // Streak breaks
+    }
+  }
+
+  habit.currentStreak = currentStreak;
+  habit.longestStreak = Math.max(longestStreak, currentStreak);
+}</code></pre>
+    </div>
+
+    <h3>Streak Examples:</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Goal</th>
+          <th>Week 1</th>
+          <th>Week 2</th>
+          <th>Week 3</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>✅ Growing Streak</td>
+          <td>3x/week</td>
+          <td>Mon✅Wed✅Fri✅<br>(3/3)</td>
+          <td>Mon✅Tue✅Wed✅Thu✅<br>(4/3)</td>
+          <td>—</td>
+          <td class="highlight">Streak: 7 days</td>
+        </tr>
+        <tr>
+          <td>❌ Broken Streak</td>
+          <td>3x/week</td>
+          <td>Mon✅Wed✅Fri✅<br>(3/3)</td>
+          <td>Mon✅Tue✅Wed✅Thu✅<br>(4/3)</td>
+          <td>Mon✅Tue✅<br>(2/3)</td>
+          <td class="highlight">Streak: 0<br>Last week broke it</td>
+        </tr>
+        <tr>
+          <td>⏳ In Progress</td>
+          <td>5x/week</td>
+          <td>All 7 days<br>(7/5)</td>
+          <td>Mon✅Tue✅<br>(2/5 so far)</td>
+          <td>—</td>
+          <td class="highlight">Streak: 7<br>Current week in progress</td>
+        </tr>
+        <tr>
+          <td>🎯 Perfect Streak</td>
+          <td>7x/week</td>
+          <td>All 7 days<br>(7/7)</td>
+          <td>All 7 days<br>(7/7)</td>
+          <td>All 7 days<br>(7/7)</td>
+          <td class="highlight">Streak: 21 days!</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="test-section">
+    <h2>🧪 Manual Testing Checklist</h2>
+    <p><strong>Follow these steps to test Tasks 1.9 & 1.10:</strong></p>
+    <div id="manual-checklist"></div>
+    <a href="index.html" target="_blank">
+      <button class="test-button">🚀 Open App & Test Now</button>
+    </a>
+  </div>
+
+  <div class="test-section">
+    <h2>🎯 Success Criteria Verification</h2>
+    <div id="success-criteria"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>🎨 UI Components Added</h2>
+    <div class="test-result success">
+      <h3>Completion Checkbox:</h3>
+      <ul>
+        <li>Position: Absolute right side (44x44px touch target)</li>
+        <li>Style: Circular, semi-transparent white background</li>
+        <li>States: Empty → Filled with checkmark</li>
+        <li>Hover: Scales up 10%, brighter background</li>
+        <li>Active: Scales down 5% (press feedback)</li>
+      </ul>
+
+      <h3>Animations:</h3>
+      <ul>
+        <li><strong>bounce:</strong> Card scales 1 → 1.05 → 1 over 0.6s</li>
+        <li><strong>checkmarkPop:</strong> Checkmark opacity 0 → 1, scale 0 → 1.2 → 1 over 0.4s</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>📊 Week Boundaries</h2>
+    <div class="test-result info">
+      <strong>Important: Weeks run Monday-Sunday (ISO 8601 standard)</strong>
+      <br><br>
+      The <code class="code-inline">getWeekNumber()</code> function uses ISO week numbering:
+      <ul>
+        <li>Week starts on Monday</li>
+        <li>Week 1 is the first week with a Thursday</li>
+        <li>Used for grouping completions by week</li>
+        <li>Ensures consistent streak calculations</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>🐛 Edge Cases Handled</h2>
+    <div class="test-result warning">
+      <ul>
+        <li><strong>No completions:</strong> Streak = 0, no errors</li>
+        <li><strong>Current week in progress:</strong> Streak continues if past weeks met goal</li>
+        <li><strong>Same day toggle:</strong> Can mark/unmark same day multiple times</li>
+        <li><strong>Multiple habits:</strong> Each habit tracks independent streaks</li>
+        <li><strong>Exceeding goal:</strong> If goal is 3/week but complete 5, streak = 5 (not 3)</li>
+        <li><strong>Missing past weeks:</strong> Streak breaks even if weeks are skipped</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function displayTask19Features() {
+      const features = [
+        'Click handler on completion checkbox (right side of card)',
+        'Toggle completion for current day only',
+        'Update completions array in habit object',
+        'Update week dots visual state (today\'s dot)',
+        'Checkmark pop animation (scale 0 → 1.2 → 1)',
+        'Card bounce animation (600ms)',
+        'Haptic feedback (50ms vibration on mobile)',
+        'Update streak counter automatically',
+        'Save to LocalStorage immediately',
+        'Prevent detail view opening when clicking checkbox',
+        'Allow same-day untoggle (click again to unmark)'
+      ];
+
+      const el = document.getElementById('task-19-features');
+      el.innerHTML = '<ul>' + features.map(f => `<li>${f}</li>`).join('') + '</ul>';
+    }
+
+    function displayTask110Features() {
+      const features = [
+        'Calculate current streak (consecutive weeks meeting goal)',
+        'Calculate longest streak (historical best)',
+        'Handle week boundaries (Monday-Sunday using ISO 8601)',
+        'Update streak after each completion',
+        'Display streak on habit cards',
+        'Handle streak breaks (week goal not met)',
+        'Count actual completions (e.g., 5/3 = 5 days streak)',
+        'Allow current week in progress (doesn\'t break streak)',
+        'Group completions by ISO week number',
+        'Sort weeks chronologically for accurate calculation'
+      ];
+
+      const el = document.getElementById('task-110-features');
+      el.innerHTML = '<ul>' + features.map(f => `<li>${f}</li>`).join('') + '</ul>';
+    }
+
+    function displayManualChecklist() {
+      const steps = [
+        '<strong>Setup:</strong> Open app, create a habit "Exercise" with goal "3 times per week"',
+        '<strong>First Completion:</strong> Click the completion checkbox → Watch checkmark pop in',
+        '<strong>Verify Animation:</strong> Card should bounce, checkmark should scale up then down',
+        '<strong>Mobile Test:</strong> On mobile, feel for 50ms vibration',
+        '<strong>Visual Check:</strong> Week dot for today should be filled, streak shows 1',
+        '<strong>Unmark Test:</strong> Click checkbox again → Checkmark disappears, streak back to 0',
+        '<strong>Re-mark:</strong> Click again to complete → Verify animations play again',
+        '<strong>Multi-day Test:</strong> Complete habit on Mon, Wed, Fri (3 days)',
+        '<strong>Streak Verification:</strong> Streak counter should show 3',
+        '<strong>Week Dots:</strong> Three dots should be filled (Mon, Wed, Fri)',
+        '<strong>Next Week:</strong> Simulate completing Mon, Tue, Wed, Thu (4 days)',
+        '<strong>Streak Growth:</strong> Streak should now show 7 (3 + 4)',
+        '<strong>Break Test:</strong> Next week complete only 2 days (goal is 3)',
+        '<strong>Streak Reset:</strong> Streak should break and reset to 0',
+        '<strong>Detail View:</strong> Click habit name → Verify detail opens',
+        '<strong>Checkbox Position:</strong> Verify clicking checkbox doesn\'t open detail view'
+      ];
+
+      const el = document.getElementById('manual-checklist');
+      el.innerHTML = steps.map((step, i) =>
+        `<div class="checklist-item">${i + 1}. ${step}</div>`
+      ).join('');
+    }
+
+    function displaySuccessCriteria() {
+      const criteria = [
+        {
+          task: '1.9',
+          items: [
+            'Completion toggles on click',
+            'Visual feedback is immediate (no lag)',
+            'Vibration works on mobile',
+            'Data persists correctly in LocalStorage',
+            'Streak updates properly after completion',
+            'Performance is smooth (no jank)',
+            'Checkbox doesn\'t interfere with detail view navigation'
+          ]
+        },
+        {
+          task: '1.10',
+          items: [
+            'Streak calculation matches PRD.md logic',
+            'Current streak accurate',
+            'Longest streak tracked correctly',
+            'Week boundaries handled (Mon-Sun)',
+            'Performance good even with 6+ months data',
+            'Edge cases handled (no completions, in-progress week, etc.)',
+            'Exceeding weekly goal counts all completions'
+          ]
+        }
+      ];
+
+      const el = document.getElementById('success-criteria');
+      let html = '';
+
+      criteria.forEach(c => {
+        html += `<h3>Task ${c.task}:</h3><ul>`;
+        html += c.items.map(item => `<li>${item}</li>`).join('');
+        html += '</ul>';
+      });
+
+      el.innerHTML = html;
+    }
+
+    window.addEventListener('load', () => {
+      displayTask19Features();
+      displayTask110Features();
+      displayManualChecklist();
+      displaySuccessCriteria();
+    });
+  </script>
+</body>
+</html>

@@ -393,6 +393,54 @@ function getChartData(habitId) {
 }
 
 /**
+ * Handle habit completion with animations and feedback
+ * @param {string} habitId - Habit ID
+ * @param {HTMLElement} card - Habit card element
+ */
+function handleHabitCompletion(habitId, card) {
+  const today = getCurrentDate();
+  const habit = getHabitById(habitId);
+
+  if (!habit) return;
+
+  const wasCompleted = habit.completions.includes(today);
+
+  // Toggle completion
+  if (wasCompleted) {
+    // Unmark completion
+    unmarkHabitCompletion(habitId, today);
+  } else {
+    // Mark complete
+    markHabitComplete(habitId);
+
+    // Play completion feedback (vibration or sound)
+    playCompletionFeedback();
+
+    // Add completion animation
+    card.classList.add('completing');
+    setTimeout(() => {
+      card.classList.remove('completing');
+    }, 600);
+  }
+
+  // Re-render habits to update UI
+  renderHabits();
+}
+
+/**
+ * Play completion feedback (vibration or sound)
+ */
+function playCompletionFeedback() {
+  // Try vibration first (works on mobile)
+  if (navigator.vibrate) {
+    navigator.vibrate(50); // Short haptic feedback
+  }
+
+  // Could add sound here in future
+  // For now, just visual + haptic feedback
+}
+
+/**
  * Render habit card HTML
  * @param {Object} habit - Habit object
  * @returns {HTMLElement} Habit card element
@@ -402,6 +450,9 @@ function createHabitCardElement(habit) {
   card.className = 'habit-card';
   card.style.backgroundColor = habit.color;
   card.dataset.habitId = habit.id;
+
+  const isCompletedToday = isHabitCompletedToday(habit.id);
+  const completedClass = isCompletedToday ? 'completed' : '';
 
   const weekDays = getWeekDays(habit.id);
   const daysHtml = weekDays
@@ -425,12 +476,27 @@ function createHabitCardElement(habit) {
       <h3 class="habit-card__title">${escapeHtml(habit.name)}</h3>
       <p class="habit-card__duration">${escapeHtml(habit.duration || 'Daily')}</p>
     </div>
+    <button class="habit-card__checkbox ${completedClass}" aria-label="Mark habit complete">
+      <span class="checkmark">✓</span>
+    </button>
   `;
 
-  // Add click handler for opening detail view
-  card.addEventListener('click', () => {
-    openHabitDetail(habit.id);
-  });
+  // Add click handler for completion checkbox
+  const checkbox = card.querySelector('.habit-card__checkbox');
+  if (checkbox) {
+    checkbox.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent opening detail view
+      handleHabitCompletion(habit.id, card);
+    });
+  }
+
+  // Add click handler for opening detail view (on card body only)
+  const cardBody = card.querySelector('.habit-card__body');
+  if (cardBody) {
+    cardBody.addEventListener('click', () => {
+      openHabitDetail(habit.id);
+    });
+  }
 
   return card;
 }

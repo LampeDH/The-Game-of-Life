@@ -741,6 +741,82 @@ button:active {
   border-radius: var(--radius-md);
 }
 
+/* Completion checkbox button */
+.habit-card__checkbox {
+  position: absolute;
+  top: 50%;
+  right: var(--space-md);
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  z-index: 10;
+  backdrop-filter: blur(4px);
+}
+
+.habit-card__checkbox:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.8);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.habit-card__checkbox:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.habit-card__checkbox .checkmark {
+  font-size: 24px;
+  color: white;
+  opacity: 0;
+  transform: scale(0);
+  transition: all var(--transition-fast);
+}
+
+.habit-card__checkbox.completed {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-color: white;
+}
+
+.habit-card__checkbox.completed .checkmark {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Completion animation */
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes checkmarkPop {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.habit-card.completing {
+  animation: bounce 0.6s ease;
+}
+
+.habit-card.completing .checkmark {
+  animation: checkmarkPop 0.4s ease;
+}
+
 /* ========== MODALS & DIALOGS ========== */
 
 .modal {
