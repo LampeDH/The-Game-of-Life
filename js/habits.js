@@ -539,15 +539,12 @@ function createHabitCardElement(habit) {
   // Add click handler for each week dot
   const dots = card.querySelectorAll('.week-dot');
   dots.forEach((dot, index) => {
-    // Since dots are reversed visually (row-reverse), access weekDays in reverse
-    const reversedIndex = weekDays.length - 1 - index;
-    const dayData = weekDays[reversedIndex];
-    if (!dayData.isDisabled) {
-      dot.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent opening detail view
-        handleDotCompletion(habit.id, dayData.date, card);
-      });
-    }
+    const dayData = weekDays[index];
+    // Allow clicking any day (past, present, or future)
+    dot.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent opening detail view
+      handleDotCompletion(habit.id, dayData.date, card);
+    });
   });
 
   // Add click handler for opening detail view (on card body)
