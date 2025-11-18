@@ -75,12 +75,35 @@
 }
 
 .date-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin: var(--space-sm) 0 0 0;
+  line-height: var(--line-height-heading);
+  padding-right: calc(44px + var(--space-md)); /* Account for + button */
+  flex-basis: 100%;
+}
+
+.header-month {
   font-size: var(--font-h2);
   font-weight: var(--font-regular);
   color: var(--text-secondary);
-  margin: var(--space-sm) 0 0 0;
-  line-height: var(--line-height-heading);
-  padding-right: var(--space-md);
+}
+
+.header-dates {
+  display: flex;
+  gap: 14px; /* Same gap as week dots */
+  align-items: center;
+}
+
+.header-date-number {
+  width: 14px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  line-height: 1;
 }
 
 /* Home screen specific header styling */
@@ -632,7 +655,7 @@ button:active {
 /* Habit card header - streak on left, dots on right */
 .habit-card__header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
   position: relative;
@@ -659,31 +682,6 @@ button:active {
 
 .streak-number {
   font-size: 14px;
-  line-height: 1;
-}
-
-/* Container for dates and dots */
-.habit-card__dates-and-dots {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  align-items: flex-end;
-}
-
-/* Date numbers row - above the dots */
-.habit-card__date-numbers {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-direction: row-reverse;
-}
-
-.week-date-number {
-  width: 14px;
-  text-align: center;
-  font-size: 10px;
-  font-weight: var(--font-semibold);
-  color: rgba(255, 255, 255, 0.7);
   line-height: 1;
 }
 

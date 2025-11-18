@@ -599,14 +599,6 @@ function createHabitCardElement(habit) {
   // Sunday appears on the right (today's position)
   const weekDaysReversed = [...weekDays].reverse();
 
-  // Generate date numbers (day of month) for each day
-  const dateNumbersHtml = weekDaysReversed
-    .map(day => {
-      const dayNumber = day.date.split('-')[2]; // Get day of month (e.g., "18")
-      return `<div class="week-date-number">${dayNumber}</div>`;
-    })
-    .join('');
-
   const daysHtml = weekDaysReversed
     .map(day => {
       const filled = day.completed ? 'filled' : '';
@@ -623,13 +615,8 @@ function createHabitCardElement(habit) {
         <span class="streak-icon">⚡</span>
         <span class="streak-number">${habit.currentStreak}</span>
       </div>
-      <div class="habit-card__dates-and-dots">
-        <div class="habit-card__date-numbers">
-          ${dateNumbersHtml}
-        </div>
-        <div class="habit-card__dots">
-          ${daysHtml}
-        </div>
+      <div class="habit-card__dots">
+        ${daysHtml}
       </div>
     </div>
     <div class="habit-card__body">
@@ -661,6 +648,24 @@ function createHabitCardElement(habit) {
 }
 
 /**
+ * Get past 7 days dates for header display
+ * @returns {Array} Array of date numbers in ascending order
+ */
+function getWeekDateNumbers() {
+  const dates = [];
+  const today = new Date();
+
+  // Get past 7 days (including today)
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    dates.push(date.getDate()); // Just the day number
+  }
+
+  return dates;
+}
+
+/**
  * Render all habits to the home screen
  */
 function renderHabits() {
@@ -686,6 +691,27 @@ function renderHabits() {
     const card = createHabitCardElement(habit);
     container.appendChild(card);
   });
+
+  // Update header date numbers
+  updateHeaderDates();
+}
+
+/**
+ * Update header with week date numbers
+ */
+function updateHeaderDates() {
+  const dateIndicator = document.getElementById('date-indicator');
+  if (!dateIndicator) return;
+
+  const weekDates = getWeekDateNumbers();
+  const datesHtml = weekDates.map(date =>
+    `<span class="header-date-number">${date}</span>`
+  ).join('');
+
+  dateIndicator.innerHTML = `
+    <span class="header-month">${getMonthYear()}</span>
+    <div class="header-dates">${datesHtml}</div>
+  `;
 }
 
 /**
