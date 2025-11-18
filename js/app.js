@@ -199,28 +199,44 @@ function renderHabitDetail(habitId) {
     </div>
   `;
 
-  // Render calendar
-  const weekDays = getWeekDays(habitId);
+  // Render calendar - full month view
+  const monthWeeks = getMonthCalendar(habitId);
   const calendarView = document.getElementById('calendar-view');
   if (calendarView) {
-    calendarView.innerHTML = '<div class="week-view">' + weekDays
-      .map(day => {
-        const isEditable = canEditDate(day.date) && !day.isDisabled;
-        const editableClass = isEditable ? 'editable' : 'disabled';
+    // Add day names header
+    const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const headerHtml = '<div class="calendar-header">' +
+      dayNames.map(name => `<div class="calendar-day-header">${name}</div>`).join('') +
+      '</div>';
+
+    // Generate weeks
+    const weeksHtml = monthWeeks.map(week => {
+      const daysHtml = week.map(day => {
+        const classes = ['calendar-day'];
+        if (!day.isCurrentMonth) classes.push('other-month');
+        if (day.isToday) classes.push('today');
+        if (day.isEditable) classes.push('editable');
+        if (!day.isEditable) classes.push('disabled');
+        if (day.completed) classes.push('has-completion');
+
         return `
-          <div class="calendar-day ${editableClass}" data-date="${day.date}">
-            <div class="day-name">${day.name}</div>
-            <div class="day-number">${day.date.split('-')[2]}</div>
+          <div class="${classes.join(' ')}" data-date="${day.date}">
+            <div class="day-number">${day.day}</div>
             <div class="day-indicator ${day.completed ? 'completed' : ''}"></div>
           </div>
         `;
-      }).join('') + '</div>';
+      }).join('');
 
-    // Add click handlers for editable dates (7-day window)
+      return `<div class="calendar-week">${daysHtml}</div>`;
+    }).join('');
+
+    calendarView.innerHTML = headerHtml + '<div class="calendar-month-grid">' + weeksHtml + '</div>';
+
+    // Add click handlers for editable dates (past 7 days only)
     const dayElements = calendarView.querySelectorAll('.calendar-day');
     dayElements.forEach((el) => {
       const dateStr = el.dataset.date;
-      const isEditable = canEditDate(dateStr) && !el.classList.contains('disabled');
+      const isEditable = el.classList.contains('editable');
 
       if (isEditable) {
         el.style.cursor = 'pointer';
@@ -229,9 +245,6 @@ function renderHabitDetail(habitId) {
           renderHabitDetail(habitId);
           renderHabits();
         });
-      } else {
-        el.style.cursor = 'not-allowed';
-        el.style.opacity = '0.5';
       }
     });
   }
@@ -341,24 +354,33 @@ function setupHabitModal() {
 
 /**
  * Open habit creation modal
+ * @param {boolean} isEdit - Whether this is an edit operation
  */
-function openHabitModal() {
+function openHabitModal(isEdit = false) {
   const modal = document.getElementById('habit-modal');
   const form = document.getElementById('habit-form');
   const title = document.getElementById('modal-title');
 
-  appState.editingHabitId = null;
+  // Only reset if not editing
+  if (!isEdit) {
+    appState.editingHabitId = null;
 
-  // Reset form
-  if (form) {
-    form.reset();
-    document.getElementById('char-count').textContent = '0';
-    document.getElementById('reminder-options').classList.add('hidden');
-  }
+    // Reset form
+    if (form) {
+      form.reset();
+      document.getElementById('char-count').textContent = '0';
+      document.getElementById('reminder-options').classList.add('hidden');
+    }
 
-  // Update title
-  if (title) {
-    title.textContent = 'Create Habit';
+    // Update title
+    if (title) {
+      title.textContent = 'Create Habit';
+    }
+  } else {
+    // Update title for edit mode
+    if (title) {
+      title.textContent = 'Edit Habit';
+    }
   }
 
   // Show modal
@@ -664,13 +686,28 @@ function editHabit(habitId) {
 
   appState.editingHabitId = habitId;
 
+  // Open modal first (in edit mode)
+  openHabitModal(true);
+
   // Populate form with habit data
   document.getElementById('habit-name').value = habit.name;
   document.getElementById('frequency-target').value = habit.frequencyTarget || 1;
   document.getElementById('frequency-period').value = habit.frequencyPeriod || 'week';
-  document.getElementById('duration-value').value = habit.duration ? habit.duration.split(' ')[0] : '';
-  document.getElementById('duration-unit').value = habit.duration ? habit.duration.split(' ')[1] : '';
+
+  // Handle duration parsing
+  if (habit.duration) {
+    const parts = habit.duration.split(' ');
+    document.getElementById('duration-value').value = parts[0] || '';
+    document.getElementById('duration-unit').value = parts.slice(1).join(' ') || '';
+  } else {
+    document.getElementById('duration-value').value = '';
+    document.getElementById('duration-unit').value = '';
+  }
+
   document.getElementById('habit-notes').value = habit.notes || '';
+
+  // Update character count for notes
+  document.getElementById('char-count').textContent = (habit.notes || '').length;
 
   // Set reminders
   const reminderToggle = document.getElementById('reminder-toggle');
@@ -678,11 +715,10 @@ function editHabit(habitId) {
   document.getElementById('reminder-options').classList.toggle('hidden', !reminderToggle.checked);
   document.getElementById('reminder-time').value = habit.reminders?.time || '';
 
-  // Update modal title
-  document.getElementById('modal-title').textContent = 'Edit Habit';
-
-  // Open modal
-  openHabitModal();
+  // Set reminder days
+  document.querySelectorAll('.reminder-day').forEach(checkbox => {
+    checkbox.checked = habit.reminders?.days?.includes(checkbox.value) || false;
+  });
 }
 
 // ========== ERROR HANDLING ==========

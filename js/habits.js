@@ -284,6 +284,91 @@ function getWeekDays(habitId, refDate = new Date()) {
 }
 
 /**
+ * Get all days in the current month for calendar view
+ * @param {string} habitId - Habit ID
+ * @param {Date} referenceDate - Reference date (defaults to today)
+ * @returns {Array} Array of week arrays with day objects
+ */
+function getMonthCalendar(habitId, referenceDate = new Date()) {
+  const habit = getHabitById(habitId);
+  if (!habit) return [];
+
+  const year = referenceDate.getFullYear();
+  const month = referenceDate.getMonth();
+
+  // Get first day of month
+  const firstDay = new Date(year, month, 1);
+  // Get last day of month
+  const lastDay = new Date(year, month + 1, 0);
+
+  // Get day of week for first day (0 = Sunday, 1 = Monday, etc.)
+  let firstDayOfWeek = firstDay.getDay();
+  // Convert to Monday = 0
+  firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+
+  const days = [];
+  const weeks = [];
+
+  // Add padding days from previous month
+  const prevMonthLastDay = new Date(year, month, 0).getDate();
+  for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+    const day = prevMonthLastDay - i;
+    const date = new Date(year, month - 1, day);
+    const dateStr = formatDate(date);
+    days.push({
+      day: day,
+      date: dateStr,
+      isCurrentMonth: false,
+      isToday: false,
+      completed: false,
+      isEditable: false
+    });
+  }
+
+  // Add days of current month
+  for (let day = 1; day <= lastDay.getDate(); day++) {
+    const date = new Date(year, month, day);
+    const dateStr = formatDate(date);
+    const today = getCurrentDate();
+    const isToday = dateStr === today;
+    const isEditable = canEditDate(dateStr) && new Date(dateStr) <= new Date(today);
+
+    days.push({
+      day: day,
+      date: dateStr,
+      isCurrentMonth: true,
+      isToday: isToday,
+      completed: habit.completions.includes(dateStr),
+      isEditable: isEditable
+    });
+  }
+
+  // Add padding days from next month
+  const remainingDays = 7 - (days.length % 7);
+  if (remainingDays < 7) {
+    for (let day = 1; day <= remainingDays; day++) {
+      const date = new Date(year, month + 1, day);
+      const dateStr = formatDate(date);
+      days.push({
+        day: day,
+        date: dateStr,
+        isCurrentMonth: false,
+        isToday: false,
+        completed: false,
+        isEditable: false
+      });
+    }
+  }
+
+  // Group into weeks
+  for (let i = 0; i < days.length; i += 7) {
+    weeks.push(days.slice(i, i + 7));
+  }
+
+  return weeks;
+}
+
+/**
  * Get date range for habit detail calendar view
  * @param {string} habitId - Habit ID
  * @param {Date} startDate - Start date for range
@@ -514,6 +599,14 @@ function createHabitCardElement(habit) {
   // Sunday appears on the right (today's position)
   const weekDaysReversed = [...weekDays].reverse();
 
+  // Generate date numbers (day of month) for each day
+  const dateNumbersHtml = weekDaysReversed
+    .map(day => {
+      const dayNumber = day.date.split('-')[2]; // Get day of month (e.g., "18")
+      return `<div class="week-date-number">${dayNumber}</div>`;
+    })
+    .join('');
+
   const daysHtml = weekDaysReversed
     .map(day => {
       const filled = day.completed ? 'filled' : '';
@@ -530,8 +623,13 @@ function createHabitCardElement(habit) {
         <span class="streak-icon">⚡</span>
         <span class="streak-number">${habit.currentStreak}</span>
       </div>
-      <div class="habit-card__dots">
-        ${daysHtml}
+      <div class="habit-card__dates-and-dots">
+        <div class="habit-card__date-numbers">
+          ${dateNumbersHtml}
+        </div>
+        <div class="habit-card__dots">
+          ${daysHtml}
+        </div>
       </div>
     </div>
     <div class="habit-card__body">
