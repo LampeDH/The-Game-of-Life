@@ -393,25 +393,27 @@ function getChartData(habitId) {
 }
 
 /**
- * Handle habit completion with animations and feedback
+ * Handle dot click completion with animations and feedback
  * @param {string} habitId - Habit ID
+ * @param {string} date - Date string (YYYY-MM-DD)
  * @param {HTMLElement} card - Habit card element
  */
-function handleHabitCompletion(habitId, card) {
-  const today = getCurrentDate();
+function handleDotCompletion(habitId, date, card) {
   const habit = getHabitById(habitId);
 
   if (!habit) return;
 
-  const wasCompleted = habit.completions.includes(today);
+  const wasCompleted = habit.completions.includes(date);
 
   // Toggle completion
   if (wasCompleted) {
     // Unmark completion
-    unmarkHabitCompletion(habitId, today);
+    unmarkHabitCompletion(habitId, date);
   } else {
     // Mark complete
-    markHabitComplete(habitId);
+    habit.completions.push(date);
+    updateStreak(habit);
+    updateHabit(habitId, habit);
 
     // Play completion feedback (vibration or sound)
     playCompletionFeedback();
@@ -458,9 +460,11 @@ function createHabitCardElement(habit) {
   const daysHtml = weekDays
     .map(day => {
       const filled = day.completed ? 'filled' : '';
-      return `<div class="week-dot ${filled}"></div>`;
+      return `<div class="week-dot ${filled}" data-date="${day.date}"><span class="checkmark">✓</span></div>`;
     })
     .join('');
+
+  const streakText = habit.currentStreak > 0 ? `${habit.currentStreak} day streak` : '';
 
   card.innerHTML = `
     <div class="habit-card__header">
@@ -471,22 +475,23 @@ function createHabitCardElement(habit) {
     <div class="habit-card__body">
       <h3 class="habit-card__title">${escapeHtml(habit.name)}</h3>
       <p class="habit-card__duration">${escapeHtml(habit.duration || 'Daily')}</p>
+      ${streakText ? `<p class="habit-card__streak">${streakText}</p>` : ''}
     </div>
-    <button class="habit-card__checkbox ${completedClass}" aria-label="Mark habit complete">
-      <span class="checkmark">✓</span>
-    </button>
   `;
 
-  // Add click handler for completion checkbox
-  const checkbox = card.querySelector('.habit-card__checkbox');
-  if (checkbox) {
-    checkbox.addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent opening detail view
-      handleHabitCompletion(habit.id, card);
-    });
-  }
+  // Add click handler for each week dot
+  const dots = card.querySelectorAll('.week-dot');
+  dots.forEach((dot, index) => {
+    const dayData = weekDays[index];
+    if (!dayData.isDisabled) {
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent opening detail view
+        handleDotCompletion(habit.id, dayData.date, card);
+      });
+    }
+  });
 
-  // Add click handler for opening detail view (on card body only)
+  // Add click handler for opening detail view (on card body)
   const cardBody = card.querySelector('.habit-card__body');
   if (cardBody) {
     cardBody.addEventListener('click', () => {
