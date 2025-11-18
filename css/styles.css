@@ -604,21 +604,141 @@ button:active {
   padding-bottom: calc(var(--nav-height) + var(--screen-padding));
 }
 
-/* Placeholder styles for habit cards (will be completed in Task 1.4) */
+/* ========== HABIT CARD COMPONENT ========== */
+
 .habit-card {
-  background-color: var(--bg-tertiary);
+  display: flex;
+  flex-direction: column;
+  background-color: #2196F3; /* Electric Blue - test color */
   border-radius: var(--radius-md);
   padding: var(--card-padding);
   margin-bottom: var(--gap-cards);
+  height: 96px;
   box-shadow: var(--shadow-1);
   transition: all var(--transition-normal);
   cursor: pointer;
-  min-height: 96px;
+  position: relative;
+  overflow: hidden;
+}
+
+.habit-card:hover {
+  box-shadow: var(--shadow-2);
+  transform: translateY(-2px);
 }
 
 .habit-card:active {
   box-shadow: var(--shadow-2);
   transform: scale(0.98);
+}
+
+/* Habit card header - top row with streak and week dots */
+.habit-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+  gap: var(--space-sm);
+}
+
+/* Streak badge - top left */
+.habit-card__streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: var(--font-bold);
+  color: white;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.streak-icon {
+  display: inline-block;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.streak-number {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Week dots display - top right */
+.habit-card__dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.week-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  border: 1.5px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.week-dot.filled {
+  background-color: white;
+  transform: scale(1.1);
+}
+
+/* Habit card body - title and duration */
+.habit-card__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  flex: 1;
+}
+
+.habit-card__title {
+  font-size: var(--font-h3);
+  font-weight: var(--font-bold);
+  color: white;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.habit-card__duration {
+  font-size: var(--font-body);
+  font-weight: var(--font-regular);
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+/* Habit color variations - for future use */
+.habit-card[style*="--habit-color"] {
+  background-color: var(--habit-color-1, #2196F3);
+}
+
+/* Darker overlay for text contrast */
+.habit-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.1) 100%);
+  pointer-events: none;
+  border-radius: var(--radius-md);
 }
 
 /* ========== MODALS & DIALOGS ========== */
