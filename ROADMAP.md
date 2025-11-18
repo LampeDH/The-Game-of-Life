@@ -125,8 +125,8 @@ This roadmap breaks down the MVP into 3 main phases, with each task taking appro
 **Deliverables:**
 - Build HTML structure for habit card
 - Implement card styling with color backgrounds (use one test color)
-- Add streak badge (top-left with lightning icon)
-- Add week dots display (top-right, 7 circles)
+- Add streak badge (top-left with lightning icon - NO pill background)
+- Add week dots display (top-right, 7 circles with transparent centers)
 - Add habit name and duration text
 - Add shadows and hover states
 - Make card responsive
@@ -142,7 +142,9 @@ This roadmap breaks down the MVP into 3 main phases, with each task taking appro
 - Test different text lengths (name overflow)
 
 **Success Criteria:**
-- Card matches DESIGN.md specifications (96px height, 12px radius)
+- Card matches DESIGN.md specifications (130px height, 12px radius, 20px padding)
+- Week dots: 14px diameter, 14px spacing, 2px border, transparent center
+- Streak badge: no pill background
 - All elements visible and styled correctly
 - Responsive to screen width
 - Touch-friendly
@@ -312,41 +314,57 @@ function renderHabits() {
 **Estimated Time:** 2 hours
 
 **Deliverables:**
-- Add click handler to habit cards
-- Detect completion checkbox click
-- Toggle completion for current day
+- Add click handlers to **individual week dots** (all 7 clickable)
+- Allow marking **any day** complete (not just today)
+- Toggle completion for selected day
 - Update completions array in habit object
 - Update week dots visual state
-- Show completion animation (checkmark fade + card bounce)
-- Play sound OR trigger vibration
-- Update streak counter
+- Show completion animation sequence (2s total):
+  - SVG checkmark draws in with stroke animation (500ms)
+  - Card bounce (scale 1.0 → 1.08 → 1.0, 450ms)
+  - Darkening overlay on rest of screen
+- Trigger haptic vibration (navigator.vibrate)
+- Update streak counter immediately
 - Save changes to LocalStorage immediately
-- Prevent multiple completions in same day
+- Support toggle (click again to unmark)
 
 **Files to Modify:**
-- `/js/habits.js` - Completion logic
-- `/css/styles.css` - Completion animations
+- `/js/habits.js` - Completion logic with dot click handlers
+- `/css/styles.css` - SVG checkmark animation + completion overlay
+
+**CRITICAL Implementation Notes:**
+- Use `flex-direction: row-reverse` to display Sunday on right
+- Reverse weekDays array in JS before rendering AND attaching handlers
+- Set z-index: 10 on dots to ensure clickability above card body
+- Use stroke-dasharray/stroke-dashoffset for checkmark draw animation
 
 **Completion Logic:**
 ```javascript
-function markHabitComplete(habitId) {
-  const today = getCurrentDate(); // 'YYYY-MM-DD'
+function handleDotCompletion(habitId, date, card) {
   const habit = getHabitById(habitId);
-  
-  if (!habit.completions.includes(today)) {
-    habit.completions.push(today);
+  const wasCompleted = habit.completions.includes(date);
+
+  if (wasCompleted) {
+    unmarkHabitCompletion(habitId, date);
+    renderHabits();
+  } else {
+    habit.completions.push(date);
     updateStreak(habit);
-    saveHabit(habit);
+    updateHabit(habitId, habit);
     playCompletionFeedback();
-    updateUI(habitId);
+    showCompletionOverlay();
+    card.classList.add('completing');
+    // Trigger checkmark draw animation
+    // After 2s: remove overlay and animation classes
   }
 }
 ```
 
 **Testing:**
-- Click habit card
-- Verify week dot fills in
-- Verify checkmark animation plays
+- Click each of the 7 week dots
+- Verify checkmark draws in smoothly
+- Verify card bounces
+- Verify overlay darkens screen
 - Listen for sound (if volume on)
 - Check LocalStorage updates
 - Refresh page, verify completion persists
