@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Storage Test - Game of Life</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #0f0f0f;
+      color: #ffffff;
+    }
+    h1 {
+      color: #4a90e2;
+    }
+    .test-section {
+      background: #1a1a1a;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border: 1px solid #333;
+    }
+    .test-result {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .success {
+      background: #1a4d2e;
+      border-left: 4px solid #4caf50;
+    }
+    .error {
+      background: #4d1a1a;
+      border-left: 4px solid #f44336;
+    }
+    button {
+      background: #4a90e2;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #357abd;
+    }
+    pre {
+      background: #000;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 LocalStorage Test Suite</h1>
+  <p>Testing Task 1.5: LocalStorage Setup & Data Model</p>
+
+  <div class="test-section">
+    <h2>Test 1: Initialize Storage</h2>
+    <button onclick="testInitialize()">Run Test</button>
+    <div id="test1-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 2: Get Data</h2>
+    <button onclick="testGetData()">Run Test</button>
+    <div id="test2-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 3: Save & Retrieve Data</h2>
+    <button onclick="testSaveData()">Run Test</button>
+    <div id="test3-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 4: Add Habit</h2>
+    <button onclick="testAddHabit()">Run Test</button>
+    <div id="test4-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 5: Update Habit</h2>
+    <button onclick="testUpdateHabit()">Run Test</button>
+    <div id="test5-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 6: Delete Habit</h2>
+    <button onclick="testDeleteHabit()">Run Test</button>
+    <div id="test6-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 7: Helper Functions</h2>
+    <button onclick="testHelpers()">Run Test</button>
+    <div id="test7-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 8: Error Handling</h2>
+    <button onclick="testErrorHandling()">Run Test</button>
+    <div id="test8-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>View Current Data</h2>
+    <button onclick="viewCurrentData()">View LocalStorage</button>
+    <button onclick="clearTestData()" style="background: #f44336;">Clear All Data</button>
+    <div id="current-data"></div>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script>
+    function showResult(elementId, success, message, data = null) {
+      const el = document.getElementById(elementId);
+      const className = success ? 'success' : 'error';
+      const icon = success ? '✅' : '❌';
+      let html = `<div class="test-result ${className}">${icon} ${message}</div>`;
+
+      if (data) {
+        html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+      }
+
+      el.innerHTML = html;
+    }
+
+    function testInitialize() {
+      try {
+        clearAllData();
+        const data = initializeStorage();
+
+        const hasUser = data && data.user && data.user.name;
+        const hasHabits = data && Array.isArray(data.habits);
+        const hasSettings = data && data.settings && data.settings.theme;
+
+        if (hasUser && hasHabits && hasSettings) {
+          showResult('test1-result', true, 'Storage initialized successfully!', data);
+        } else {
+          showResult('test1-result', false, 'Storage initialization incomplete');
+        }
+      } catch (error) {
+        showResult('test1-result', false, `Error: ${error.message}`);
+      }
+    }
+
+    function testGetData() {
+      try {
+        const data = getData();
+
+        if (data) {
+          showResult('test2-result', true, 'Data retrieved successfully!', data);
+        } else {
+          showResult('test2-result', false, 'No data found. Try initializing first.');
+        }
+      } catch (error) {
+        showResult('test2-result', false, `Error: ${error.message}`);
+      }
+    }
+
+    function testSaveData() {
+      try {
+        const testData = {
+          user: { name: 'Test User', goals: 'Test goals', createdAt: new Date().toISOString() },
+          habits: [],
+          settings: { theme: 'dark' }
+        };
+
+        const saved = saveData(testData);
+        const retrieved = getData();
+
+        const matches = JSON.stringify(testData) === JSON.stringify(retrieved);
+
+        if (saved && matches) {
+          showResult('test3-result', true, 'Data saved and retrieved successfully!', retrieved);
+        } else {
+          showResult('test3-result', false, 'Data mismatch after save/retrieve');
+        }
+      } catch (error) {
+        showResult('test3-result', false, `Error: ${error.message}`);
+      }
+    }
+
+    function testAddHabit() {
+      try {
+        initializeStorage();
+
+        const testHabit = {
+          id: generateId(),
+          name: 'Test Habit',
+          duration: '10 Minutes',
+          frequencyTarget: 3,
+          frequencyPeriod: 'week',
+          color: '#4a90e2',
+          completions: [],
+          currentStreak: 0,
+          longestStreak: 0,
+          createdAt: new Date().toISOString()
+        };
+
+        const added = addHabit(testHabit);
+        const habits = getAllHabits();
+
+        if (added && habits.length > 0) {
+          showResult('test4-result', true, 'Habit added successfully!', habits);
+        } else {
+          showResult('test4-result', false, 'Failed to add habit');
+        }
+      } catch (error) {
+        showResult('test4-result', false, `Error: ${error.message}`);
+      }
+    }
+
+    function testUpdateHabit() {
+      try {
+        const habits = getAllHabits();
+
+        if (habits.length === 0) {
+          showResult('test5-result', false, 'No habits to update. Run Test 4 first.');
+          return;
+        }
+
+        const habitId = habits[0].id;
+        const updated = updateHabit(habitId, { name: 'Updated Habit Name' });
+        const habit = getHabitById(habitId);
+
+        if (updated && habit.name === 'Updated Habit Name') {
+          showResult('test5-result', true, 'Habit updated successfully!', habit);
+        } else {
+          showResult('test5-result', false, 'Failed to update habit');
+        }
+      } catch (error) {
+        showResult('test5-result', false, `Error: ${error.message}`);
+      }
+    }
+
+    function testDeleteHabit() {
+      try {
+        const habitsBefore = getAllHabits();
+
+        if (habitsBefore.length === 0) {
+          showResult('test6-result', false, 'No habits to delete. Run Test 4 first.');
+          return;
+        }
+
+        const habitId = habitsBefore[0].id;
+        const deleted = deleteHabit(habitId);
+        const habitsAfter = getAllHabits();
+
+        if (deleted && habitsAfter.length === habitsBefore.length - 1) {
+          showResult('test6-result', true, 'Habit deleted successfully!', {
+            before: habitsBefore.length,
+            after: habitsAfter.length
+          });
+        } else {
+          showResult('test6-result', false, 'Failed to delete habit');
+        }
+      } catch (error) {
+        showResult('test6-result', false, `Error: ${error.message}`);
+      }
+    }
+
+    function testHelpers() {
+      try {
+        const id = generateId();
+        const date = getCurrentDate();
+        const formattedDate = formatDate(new Date());
+        const monthYear = getMonthYear();
+
+        const results = {
+          generatedId: id,
+          currentDate: date,
+          formattedDate: formattedDate,
+          monthYear: monthYear
+        };
+
+        const validId = id && id.startsWith('id-');
+        const validDate = /^\d{4}-\d{2}-\d{2}$/.test(date);
+
+        if (validId && validDate) {
+          showResult('test7-result', true, 'All helper functions working!', results);
+        } else {
+          showResult('test7-result', false, 'Helper functions not working correctly');
+        }
+      } catch (error) {
+        showResult('test7-result', false, `Error: ${error.message}`);
+      }
+    }
+
+    function testErrorHandling() {
+      try {
+        // Test with invalid data
+        const result1 = getHabitById('invalid-id');
+        const result2 = updateHabit('invalid-id', {});
+        const result3 = deleteHabit('invalid-id');
+
+        if (result1 === null && result2 === false && result3 === false) {
+          showResult('test8-result', true, 'Error handling works correctly!', {
+            invalidGetById: result1,
+            invalidUpdate: result2,
+            invalidDelete: result3
+          });
+        } else {
+          showResult('test8-result', false, 'Error handling not working as expected');
+        }
+      } catch (error) {
+        showResult('test8-result', false, `Unexpected error: ${error.message}`);
+      }
+    }
+
+    function viewCurrentData() {
+      const data = getData();
+      const el = document.getElementById('current-data');
+
+      if (data) {
+        el.innerHTML = '<h3>Current LocalStorage Data:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+      } else {
+        el.innerHTML = '<p>No data in LocalStorage</p>';
+      }
+    }
+
+    function clearTestData() {
+      if (confirm('Are you sure you want to clear all data?')) {
+        clearAllData();
+        document.getElementById('current-data').innerHTML = '<p style="color: #4caf50;">✅ All data cleared!</p>';
+
+        // Clear all test results
+        for (let i = 1; i <= 8; i++) {
+          document.getElementById(`test${i}-result`).innerHTML = '';
+        }
+      }
+    }
+
+    // Run initialization test on load
+    window.addEventListener('load', () => {
+      console.log('🧪 Test page loaded. Ready to test LocalStorage!');
+    });
+  </script>
+</body>
+</html>
