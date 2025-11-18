@@ -93,7 +93,7 @@ These vibrant, saturated colors are randomly assigned to habits:
 **Font Sizes:**
 - **H1 (Page Title):** 32px, Bold (e.g., "Habits")
 - **H2 (Section Title):** 24px, Semibold (e.g., "November")
-- **H3 (Habit Name):** 20px, Bold (on habit cards)
+- **H3 (Habit Name):** 22px, Bold (on habit cards - increased for readability)
 - **Body Large:** 16px, Regular (descriptions, paragraphs)
 - **Body:** 14px, Regular (metadata, secondary info)
 - **Small:** 12px, Regular (timestamps, helper text)
@@ -124,10 +124,12 @@ These vibrant, saturated colors are randomly assigned to habits:
 - `2xl`: 48px (major sections)
 
 **Component Spacing:**
-- Padding inside cards: 16px
+- Padding inside habit cards: 20px
 - Gap between habit cards: 12px
 - Screen edge padding: 20px
 - Bottom navigation height: 64px
+- Week dot spacing: 14px gap
+- Streak badge gap (icon to number): 4px
 
 ---
 
@@ -252,41 +254,48 @@ box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
 
 **Dimensions:**
 - Width: Screen width - 40px (20px padding each side)
-- Height: 96px (comfortable touch target)
+- Height: 130px (increased for better readability)
 - Border radius: 12px
 - Margin bottom: 12px
+- Padding: 20px
 
 **Layout:**
 ```
 ┌─────────────────────────────────────┐
-│ ⚡ 3        ○ ○ ○ ○ ○ ○ ○           │  <- Top row
+│ ⚡ 3        ○ ○ ○ ○ ○ ○ ✓           │  <- Top row
+│                                      │
 │                                      │
 │ Pray                                 │  <- Habit name (H3)
 │ 1 Minute                             │  <- Duration (Body)
-│                                      │
 └─────────────────────────────────────┘
 ```
 
 **Elements:**
 1. **Streak Badge (Top-left)**
-   - Lightning bolt icon ⚡ (16px)
+   - Lightning bolt icon ⚡ (14px)
    - Number (14px, bold)
-   - Color: White with 20% opacity background
-   - Padding: 6px × 10px
-   - Border radius: 12px (pill shape)
+   - Color: White (NO background - clean minimal design)
+   - Always visible, even when streak is 0
+   - Gap: 4px between icon and number
 
 2. **Week Dots (Top-right)**
-   - 7 circles representing Mon-Sun
-   - Each circle: 10px diameter
-   - Spacing: 6px between circles
-   - Filled (white): Completed
-   - Outlined (white 30% opacity): Not completed
-   - Slightly larger + scale animation on completion
+   - 7 circles representing the week
+   - Visual order: Mon → Sun (left to right)
+   - **Rightmost dot = Today (Sunday)**
+   - Each circle: 14px diameter
+   - Border: 2px solid white (50% opacity)
+   - Spacing: 14px between circles
+   - Background: Transparent (not filled)
+   - **ALL DOTS ARE CLICKABLE** - can mark any day complete
+   - Hover: Border brightens to 80% opacity, scale 1.15
+   - Completed state: Border removed, checkmark SVG appears
+   - Checkmark: White stroke, draws in with animation (500ms)
 
-3. **Habit Name (Center-left)**
-   - Font: H3 (20px, bold)
+3. **Habit Name (Bottom-left)**
+   - Font: H3 (22px, bold)
    - Color: White
    - Max: 1 line, ellipsis if overflow
+   - Position: flex-end (bottom of card)
 
 4. **Duration (Below name)**
    - Font: Body (14px, regular)
@@ -295,16 +304,18 @@ box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
 
 **Background:**
 - Solid color from the 10-color palette
-- Slightly darker overlay (5% black) for depth
+- No overlay for depth
 
 **States:**
 - **Resting:** Level 1 shadow
-- **Pressed:** Level 2 shadow + slight scale (0.98)
-- **Completed (today):** Checkmark icon overlays top-right dots
+- **Hover:** Level 2 shadow only (no transform)
+- **Pressed (card body):** Scale (0.98)
+- **Completing (animation):** Bounce animation (450ms)
 
 **Interaction:**
-- Tap anywhere on card → Opens habit detail view
-- Long press → Quick actions menu (Edit | Delete)
+- **Tap week dot** → Marks that day complete with animation
+- **Tap card body** → Opens habit detail view
+- Long press → Quick actions menu (Edit | Delete) - Future feature
 
 ---
 
@@ -603,19 +614,41 @@ When expanded:
 ### Micro-interactions
 
 #### Habit Completion
-**Trigger:** User taps checkbox on habit card
+**Trigger:** User taps any week dot on habit card
 
-**Animation sequence (300ms total):**
-1. Checkbox fade-in with checkmark (100ms)
-2. Habit card scale bounce (200ms):
-   - Scale from 1.0 → 1.05 → 1.0
-   - Easing: spring
-3. Completion dot fills in calendar (100ms fade)
-4. Streak counter updates with number count-up animation (200ms)
+**Animation sequence (2000ms total):**
 
-**Sound:** 
-- If volume on: Satisfying "ding" sound (short, pleasant)
-- If silent mode: Haptic feedback (medium impact)
+1. **Instant (0ms):**
+   - Habit card starts bounce animation
+   - Screen darkening overlay fades in (300ms)
+   - Dot border removed, checkmark SVG becomes visible
+   - Haptic feedback (if supported)
+
+2. **Checkmark Draw Animation (500ms):**
+   - SVG stroke draws in using stroke-dasharray technique
+   - Path animates from stroke-dashoffset: 15 → 0
+   - Easing: ease
+   - Creates "drawing" effect as checkmark appears
+
+3. **Card Bounce (450ms):**
+   - Scale from 1.0 → 1.08 → 1.0
+   - Easing: ease
+   - Card maintains position, only scales
+
+4. **Overlay Darkening (2000ms duration):**
+   - Background darkens to rgba(0, 0, 0, 0.4)
+   - z-index: 999 (below card, above other cards)
+   - Fades out after 2 seconds
+   - Easing: ease (300ms fade in/out)
+
+5. **Streak Counter Update (Instant):**
+   - Number updates immediately (no count-up animation)
+   - Displays in same position without re-render
+
+**Feedback:**
+- Haptic: navigator.vibrate(50) if supported
+- Visual: Full animation sequence above
+- No sound in MVP (future feature)
 
 #### Avatar Swipe
 **Trigger:** User swipes left/right on avatar image
@@ -913,6 +946,37 @@ When expanded:
 
 ---
 
+### Habit Card Implementation Details
+
+**Critical z-index layering:**
+- `.habit-card__header`: z-index: 10 (ensures dots stay above card body)
+- `.habit-card__dots`: z-index: 10 + pointer-events: auto
+- `.week-dot`: z-index: 10 + pointer-events: auto
+- `.habit-card__body`: z-index: 1 (below interactive elements)
+- `.completion-overlay`: z-index: 999 (above all cards, below modals)
+
+**Week dots visual order (IMPORTANT):**
+- CSS uses `flex-direction: row-reverse` to display Sun on right
+- JavaScript MUST reverse the weekDays array before rendering HTML
+- JavaScript MUST use reversed array when attaching click handlers
+- This ensures DOM order matches visual order for proper click mapping
+
+**SVG Checkmark Animation:**
+- Uses `stroke-dasharray` and `stroke-dashoffset` for draw effect
+- Path length: approximately 15px
+- Initial state: `stroke-dashoffset: 15` (invisible)
+- Animated state: `stroke-dashoffset: 0` (fully drawn)
+- Opacity controls visibility (0 when not filled, 1 when filled)
+- Animation triggered by adding `.animating` class
+
+**Completion overlay:**
+- Fixed position covering entire viewport
+- Prevents interaction with other elements during animation
+- Fades in/out with opacity transition (300ms)
+- Automatically removed after 2-second animation completes
+
+---
+
 ### Image Optimization
 
 **Avatar images:**
@@ -967,7 +1031,17 @@ When expanded:
 
 ### Version History
 - v1.0 (2024-11-13) - Initial design specifications
+- v1.1 (2024-11-18) - Updated to match actual implementation:
+  - Habit card height: 96px → 130px
+  - Habit card padding: 16px → 20px
+  - Week dots: 10px → 14px, spacing 6px → 14px
+  - Week dots now clickable with checkmark animation
+  - Streak badge: removed pill background
+  - Habit name font size: 20px → 22px
+  - Updated completion animation sequence (2s total with overlay)
+  - Added z-index implementation notes
+  - Added week dots visual order implementation notes
 
 ---
 
-**Status:** Finalized - Ready for ROADMAP.md and implementation
+**Status:** Updated to reflect current implementation (as of 2024-11-18)

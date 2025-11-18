@@ -393,6 +393,109 @@ function getChartData(habitId) {
 }
 
 /**
+ * Handle dot click completion with animations and feedback
+ * @param {string} habitId - Habit ID
+ * @param {string} date - Date string (YYYY-MM-DD)
+ * @param {HTMLElement} card - Habit card element
+ */
+function handleDotCompletion(habitId, date, card) {
+  const habit = getHabitById(habitId);
+
+  if (!habit) return;
+
+  const wasCompleted = habit.completions.includes(date);
+
+  // Toggle completion
+  if (wasCompleted) {
+    // Unmark completion
+    unmarkHabitCompletion(habitId, date);
+    renderHabits();
+  } else {
+    // Mark complete
+    habit.completions.push(date);
+    updateStreak(habit);
+    updateHabit(habitId, habit);
+
+    // Play completion feedback (vibration or sound)
+    playCompletionFeedback();
+
+    // Show darkening overlay
+    showCompletionOverlay();
+
+    // Add completion animation to card
+    card.classList.add('completing');
+
+    // Find the clicked dot and trigger animation
+    const dots = card.querySelectorAll('.week-dot');
+    dots.forEach(dot => {
+      if (dot.dataset.date === date) {
+        // Add filled class and animation
+        dot.classList.add('filled');
+        dot.classList.add('animating');
+
+        // Trigger reflow to restart animation
+        void dot.offsetWidth;
+      }
+    });
+
+    // Update streak counter without full re-render
+    const streakEl = card.querySelector('.streak-number');
+    if (streakEl) {
+      streakEl.textContent = habit.currentStreak;
+    }
+
+    setTimeout(() => {
+      card.classList.remove('completing');
+      hideCompletionOverlay();
+
+      // Remove animation class after animation completes
+      dots.forEach(dot => {
+        if (dot.dataset.date === date) {
+          dot.classList.remove('animating');
+        }
+      });
+    }, 2000);
+  }
+}
+
+/**
+ * Show darkening overlay
+ */
+function showCompletionOverlay() {
+  let overlay = document.getElementById('completion-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'completion-overlay';
+    overlay.className = 'completion-overlay';
+    document.body.appendChild(overlay);
+  }
+  setTimeout(() => overlay.classList.add('active'), 10);
+}
+
+/**
+ * Hide darkening overlay
+ */
+function hideCompletionOverlay() {
+  const overlay = document.getElementById('completion-overlay');
+  if (overlay) {
+    overlay.classList.remove('active');
+  }
+}
+
+/**
+ * Play completion feedback (vibration or sound)
+ */
+function playCompletionFeedback() {
+  // Try vibration first (works on mobile)
+  if (navigator.vibrate) {
+    navigator.vibrate(50); // Short haptic feedback
+  }
+
+  // Could add sound here in future
+  // For now, just visual + haptic feedback
+}
+
+/**
  * Render habit card HTML
  * @param {Object} habit - Habit object
  * @returns {HTMLElement} Habit card element
@@ -403,11 +506,21 @@ function createHabitCardElement(habit) {
   card.style.backgroundColor = habit.color;
   card.dataset.habitId = habit.id;
 
+  const isCompletedToday = isHabitCompletedToday(habit.id);
+  const completedClass = isCompletedToday ? 'completed' : '';
+
   const weekDays = getWeekDays(habit.id);
-  const daysHtml = weekDays
+  // Reverse weekDays array so when row-reverse CSS is applied,
+  // Sunday appears on the right (today's position)
+  const weekDaysReversed = [...weekDays].reverse();
+
+  const daysHtml = weekDaysReversed
     .map(day => {
       const filled = day.completed ? 'filled' : '';
-      return `<div class="week-dot ${filled}"></div>`;
+      const svgCheck = `<svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 7 L6 10 L11 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="fill: none;"/>
+      </svg>`;
+      return `<div class="week-dot ${filled}" data-date="${day.date}">${svgCheck}</div>`;
     })
     .join('');
 
@@ -427,10 +540,24 @@ function createHabitCardElement(habit) {
     </div>
   `;
 
-  // Add click handler for opening detail view
-  card.addEventListener('click', () => {
-    openHabitDetail(habit.id);
+  // Add click handler for each week dot - use reversed array to match DOM order
+  const dots = card.querySelectorAll('.week-dot');
+  dots.forEach((dot, index) => {
+    const dayData = weekDaysReversed[index];
+    // Allow clicking any day (past, present, or future)
+    dot.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent opening detail view
+      handleDotCompletion(habit.id, dayData.date, card);
+    });
   });
+
+  // Add click handler for opening detail view (on card body)
+  const cardBody = card.querySelector('.habit-card__body');
+  if (cardBody) {
+    cardBody.addEventListener('click', () => {
+      openHabitDetail(habit.id);
+    });
+  }
 
   return card;
 }
