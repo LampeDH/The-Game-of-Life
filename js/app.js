@@ -69,16 +69,23 @@ function updateDateIndicator() {
  */
 function setupNavigation() {
   const navTabs = document.querySelectorAll('.nav-tab');
-  const views = document.querySelectorAll('.view');
 
   navTabs.forEach(tab => {
     tab.addEventListener('click', () => {
       const targetTab = tab.dataset.tab;
-      switchView(targetTab);
 
-      // Update active state
-      navTabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
+      // If clicking on habits tab while in detail view, go back to habits list
+      if (targetTab === 'habits' && appState.currentHabitDetail) {
+        returnToHabits();
+      } else {
+        switchView(targetTab);
+      }
+
+      // Update active state - only update if not in detail view
+      if (!appState.currentHabitDetail || targetTab === 'habits') {
+        navTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      }
     });
   });
 
