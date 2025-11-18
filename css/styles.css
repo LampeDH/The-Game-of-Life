@@ -184,14 +184,28 @@
   font-weight: var(--font-bold);
 }
 
+.nav-tab.active .nav-icon {
+  color: #ffffff;
+}
+
+[data-theme="light"] .nav-tab.active .nav-icon {
+  color: #000000;
+}
+
 .nav-tab.active:active {
   transform: scale(1);
 }
 
 .nav-icon {
-  font-size: 24px;
   display: block;
   line-height: 1;
+  color: #808080;
+}
+
+.nav-icon svg {
+  display: block;
+  width: 24px;
+  height: 24px;
 }
 
 .nav-label {
@@ -446,6 +460,7 @@ button:active {
 .form-input.input-small {
   flex: 1;
   min-height: 40px;
+  min-width: 0;
 }
 
 .form-checkbox {
@@ -476,6 +491,7 @@ button:active {
 .duration-inputs {
   display: flex;
   gap: var(--space-sm);
+  min-width: 0;
 }
 
 .day-selector {
@@ -1018,5 +1034,9 @@ button:active {
     --bg-tertiary: #e8e8e8;
     --text-primary: #1a1a1a;
     --text-secondary: #666666;
+  }
+
+  .nav-tab.active .nav-icon {
+    color: #000000;
   }
 }
