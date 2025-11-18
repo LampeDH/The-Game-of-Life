@@ -611,9 +611,9 @@ button:active {
   flex-direction: column;
   background-color: #2196F3; /* Electric Blue - test color */
   border-radius: var(--radius-md);
-  padding: var(--card-padding);
+  padding: 20px;
   margin-bottom: var(--gap-cards);
-  height: 96px;
+  height: 130px;
   box-shadow: var(--shadow-1);
   transition: all var(--transition-normal);
   cursor: pointer;
@@ -631,64 +631,33 @@ button:active {
   transform: scale(0.98);
 }
 
-/* Habit card header - top row with streak and week dots */
+/* Habit card header - top row with week dots only */
 .habit-card__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-md);
-  gap: var(--space-sm);
+  justify-content: flex-end;
+  margin-bottom: 16px;
 }
 
-/* Streak badge - top left */
-.habit-card__streak {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 10px;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-full);
-  font-size: 12px;
-  font-weight: var(--font-bold);
-  color: white;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.streak-icon {
-  display: inline-block;
-  font-size: 14px;
-  line-height: 1;
-}
-
-.streak-number {
-  font-size: 14px;
-  line-height: 1;
-}
-
-/* Week dots display - top right */
+/* Week dots display - top right, transparent with border only */
 .habit-card__dots {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  gap: 4px;
-  flex: 1;
-  justify-content: flex-end;
+  gap: 8px;
 }
 
 .week-dot {
-  width: 10px;
-  height: 10px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.3);
-  border: 1.5px solid transparent;
+  background-color: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.5);
   transition: all var(--transition-fast);
 }
 
 .week-dot.filled {
   background-color: white;
-  transform: scale(1.1);
+  border-color: white;
 }
 
 /* Habit card body - title and duration */
@@ -697,10 +666,11 @@ button:active {
   flex-direction: column;
   justify-content: flex-end;
   flex: 1;
+  gap: 4px;
 }
 
 .habit-card__title {
-  font-size: var(--font-h3);
+  font-size: 22px;
   font-weight: var(--font-bold);
   color: white;
   margin: 0;
@@ -708,19 +678,19 @@ button:active {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
 .habit-card__duration {
-  font-size: var(--font-body);
+  font-size: 16px;
   font-weight: var(--font-regular);
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
   margin: 0;
   padding: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
 /* Habit color variations - for future use */

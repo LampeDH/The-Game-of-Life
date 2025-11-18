@@ -464,10 +464,6 @@ function createHabitCardElement(habit) {
 
   card.innerHTML = `
     <div class="habit-card__header">
-      <div class="habit-card__streak">
-        <span class="streak-icon">⚡</span>
-        <span class="streak-number">${habit.currentStreak}</span>
-      </div>
       <div class="habit-card__dots">
         ${daysHtml}
       </div>
