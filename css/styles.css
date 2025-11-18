@@ -92,6 +92,9 @@
   gap: 0;
   z-index: 100;
   padding-bottom: max(0, env(safe-area-inset-bottom));
+  box-shadow: var(--shadow-2);
+  /* Ensure nav tabs don't scale with transform and push content up */
+  will-change: transform;
 }
 
 .nav-tab {
@@ -109,27 +112,40 @@
   color: var(--text-secondary);
   transition: all var(--transition-normal);
   font-size: var(--font-small);
-  font-weight: var(--font-semibold);
+  font-weight: var(--font-regular);
   padding: var(--space-sm);
+  -webkit-user-select: none;
+  user-select: none;
+  min-width: 0;
 }
 
 .nav-tab:active {
   background-color: rgba(74, 144, 226, 0.1);
+  transform: scale(0.95);
 }
 
 .nav-tab.active {
   color: var(--accent);
   border-top-color: var(--accent);
   background-color: rgba(74, 144, 226, 0.05);
+  font-weight: var(--font-bold);
+}
+
+.nav-tab.active:active {
+  transform: scale(1);
 }
 
 .nav-icon {
   font-size: 24px;
   display: block;
+  line-height: 1;
 }
 
 .nav-label {
   display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ========== BUTTONS ========== */
