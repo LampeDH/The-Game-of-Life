@@ -191,11 +191,11 @@ Taking inspiration from Onrise app:
 ## MVP Scope (Phase 1-3)
 
 ### Phase 1: Core Habit Tracking ✓
-- Home screen with habit cards
-- Add/edit/delete habits
-- Daily checkbox completion
-- Calendar view of completions
-- Streak counter
+- Home screen with habit cards (130px height, 20px padding)
+- Add/edit/delete habits via modal
+- Week dots completion (all 7 days clickable with SVG checkmark draw animation)
+- Calendar view of completions (in habit cards)
+- Streak counter (always visible, no pill background)
 - LocalStorage persistence
 
 ### Phase 2: Avatar Display ✓
