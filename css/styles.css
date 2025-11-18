@@ -636,7 +636,7 @@ button:active {
   justify-content: space-between;
   margin-bottom: 16px;
   position: relative;
-  z-index: 2;
+  z-index: 10;
 }
 
 /* Streak badge - top left (no pill background) */
@@ -668,8 +668,9 @@ button:active {
   align-items: center;
   gap: 14px;
   position: relative;
-  z-index: 2;
+  z-index: 10;
   flex-direction: row-reverse;
+  pointer-events: auto;
 }
 
 .week-dot {
@@ -685,6 +686,8 @@ button:active {
   justify-content: center;
   flex-shrink: 0;
   transition: transform 0.2s ease;
+  z-index: 10;
+  pointer-events: auto;
 }
 
 .week-dot:hover {

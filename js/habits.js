@@ -399,7 +399,6 @@ function getChartData(habitId) {
  * @param {HTMLElement} card - Habit card element
  */
 function handleDotCompletion(habitId, date, card) {
-  console.log(`handleDotCompletion called with date: ${date}`);
   const habit = getHabitById(habitId);
 
   if (!habit) return;
@@ -428,11 +427,8 @@ function handleDotCompletion(habitId, date, card) {
 
     // Find the clicked dot and trigger animation
     const dots = card.querySelectorAll('.week-dot');
-    console.log('Searching through dots for date:', date);
-    dots.forEach((dot, idx) => {
-      console.log(`  Dot ${idx}: data-date="${dot.dataset.date}", matches: ${dot.dataset.date === date}`);
+    dots.forEach(dot => {
       if (dot.dataset.date === date) {
-        console.log(`  -> FOUND! Adding animation to dot ${idx}`);
         // Add filled class and animation
         dot.classList.add('filled');
         dot.classList.add('animating');
@@ -542,16 +538,10 @@ function createHabitCardElement(habit) {
 
   // Add click handler for each week dot
   const dots = card.querySelectorAll('.week-dot');
-  console.log('Total dots found:', dots.length);
-  console.log('WeekDays array:', weekDays.map(d => ({ name: d.name, date: d.date })));
-
   dots.forEach((dot, index) => {
     const dayData = weekDays[index];
-    console.log(`Attaching handler to dot ${index}: ${dayData.name} (${dayData.date})`, 'DOM element:', dot);
-
     // Allow clicking any day (past, present, or future)
     dot.addEventListener('click', (e) => {
-      console.log(`Dot clicked! Index: ${index}, Day: ${dayData.name}, Date: ${dayData.date}`);
       e.stopPropagation(); // Prevent opening detail view
       handleDotCompletion(habit.id, dayData.date, card);
     });
