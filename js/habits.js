@@ -422,21 +422,38 @@ function handleDotCompletion(habitId, date, card) {
     // Show darkening overlay
     showCompletionOverlay();
 
-    // Add completion animation
+    // Add completion animation to card
     card.classList.add('completing');
 
-    // Find the clicked dot and add animation class
+    // Find the clicked dot and trigger animation
     const dots = card.querySelectorAll('.week-dot');
     dots.forEach(dot => {
       if (dot.dataset.date === date) {
+        // Add filled class and animation
+        dot.classList.add('filled');
         dot.classList.add('animating');
+
+        // Trigger reflow to restart animation
+        void dot.offsetWidth;
       }
     });
+
+    // Update streak counter without full re-render
+    const streakEl = card.querySelector('.streak-number');
+    if (streakEl) {
+      streakEl.textContent = habit.currentStreak;
+    }
 
     setTimeout(() => {
       card.classList.remove('completing');
       hideCompletionOverlay();
-      renderHabits();
+
+      // Remove animation class after animation completes
+      dots.forEach(dot => {
+        if (dot.dataset.date === date) {
+          dot.classList.remove('animating');
+        }
+      });
     }, 2000);
   }
 }
@@ -497,9 +514,7 @@ function createHabitCardElement(habit) {
     .map(day => {
       const filled = day.completed ? 'filled' : '';
       const svgCheck = `<svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 7 L6 10 L11 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-        stroke-dasharray="20" stroke-dashoffset="${day.completed ? '0' : '20'}"
-        style="fill: none;"/>
+        <path d="M3 7 L6 10 L11 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="fill: none;"/>
       </svg>`;
       return `<div class="week-dot ${filled}" data-date="${day.date}">${svgCheck}</div>`;
     })
@@ -524,7 +539,9 @@ function createHabitCardElement(habit) {
   // Add click handler for each week dot
   const dots = card.querySelectorAll('.week-dot');
   dots.forEach((dot, index) => {
-    const dayData = weekDays[index];
+    // Since dots are reversed visually (row-reverse), access weekDays in reverse
+    const reversedIndex = weekDays.length - 1 - index;
+    const dayData = weekDays[reversedIndex];
     if (!dayData.isDisabled) {
       dot.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent opening detail view
