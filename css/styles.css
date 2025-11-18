@@ -611,7 +611,7 @@ button:active {
   flex-direction: column;
   background-color: #2196F3; /* Electric Blue - test color */
   border-radius: var(--radius-md);
-  padding: 16px;
+  padding: 18px;
   margin-bottom: var(--gap-cards);
   height: 130px;
   box-shadow: var(--shadow-1);
@@ -671,7 +671,7 @@ button:active {
 .habit-card__dots {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 12px;
   justify-content: flex-end;
 }
 
@@ -705,7 +705,7 @@ button:active {
 }
 
 .habit-card__title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: var(--font-bold);
   color: white;
   margin: 0;
@@ -715,7 +715,7 @@ button:active {
 }
 
 .habit-card__duration {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: var(--font-regular);
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
