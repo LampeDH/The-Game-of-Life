@@ -510,7 +510,11 @@ function createHabitCardElement(habit) {
   const completedClass = isCompletedToday ? 'completed' : '';
 
   const weekDays = getWeekDays(habit.id);
-  const daysHtml = weekDays
+  // Reverse weekDays array so when row-reverse CSS is applied,
+  // Sunday appears on the right (today's position)
+  const weekDaysReversed = [...weekDays].reverse();
+
+  const daysHtml = weekDaysReversed
     .map(day => {
       const filled = day.completed ? 'filled' : '';
       const svgCheck = `<svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -536,10 +540,10 @@ function createHabitCardElement(habit) {
     </div>
   `;
 
-  // Add click handler for each week dot
+  // Add click handler for each week dot - use reversed array to match DOM order
   const dots = card.querySelectorAll('.week-dot');
   dots.forEach((dot, index) => {
-    const dayData = weekDays[index];
+    const dayData = weekDaysReversed[index];
     // Allow clicking any day (past, present, or future)
     dot.addEventListener('click', (e) => {
       e.stopPropagation(); // Prevent opening detail view
