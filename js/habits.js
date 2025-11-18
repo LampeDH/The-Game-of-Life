@@ -409,6 +409,7 @@ function handleDotCompletion(habitId, date, card) {
   if (wasCompleted) {
     // Unmark completion
     unmarkHabitCompletion(habitId, date);
+    renderHabits();
   } else {
     // Mark complete
     habit.completions.push(date);
@@ -418,15 +419,50 @@ function handleDotCompletion(habitId, date, card) {
     // Play completion feedback (vibration or sound)
     playCompletionFeedback();
 
+    // Show darkening overlay
+    showCompletionOverlay();
+
     // Add completion animation
     card.classList.add('completing');
+
+    // Find the clicked dot and add animation class
+    const dots = card.querySelectorAll('.week-dot');
+    dots.forEach(dot => {
+      if (dot.dataset.date === date) {
+        dot.classList.add('animating');
+      }
+    });
+
     setTimeout(() => {
       card.classList.remove('completing');
-    }, 600);
+      hideCompletionOverlay();
+      renderHabits();
+    }, 2000);
   }
+}
 
-  // Re-render habits to update UI
-  renderHabits();
+/**
+ * Show darkening overlay
+ */
+function showCompletionOverlay() {
+  let overlay = document.getElementById('completion-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'completion-overlay';
+    overlay.className = 'completion-overlay';
+    document.body.appendChild(overlay);
+  }
+  setTimeout(() => overlay.classList.add('active'), 10);
+}
+
+/**
+ * Hide darkening overlay
+ */
+function hideCompletionOverlay() {
+  const overlay = document.getElementById('completion-overlay');
+  if (overlay) {
+    overlay.classList.remove('active');
+  }
 }
 
 /**
@@ -460,14 +496,21 @@ function createHabitCardElement(habit) {
   const daysHtml = weekDays
     .map(day => {
       const filled = day.completed ? 'filled' : '';
-      return `<div class="week-dot ${filled}" data-date="${day.date}"><span class="checkmark">✓</span></div>`;
+      const svgCheck = `<svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 7 L6 10 L11 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        stroke-dasharray="20" stroke-dashoffset="${day.completed ? '0' : '20'}"
+        style="fill: none;"/>
+      </svg>`;
+      return `<div class="week-dot ${filled}" data-date="${day.date}">${svgCheck}</div>`;
     })
     .join('');
 
-  const streakText = habit.currentStreak > 0 ? `${habit.currentStreak} day streak` : '';
-
   card.innerHTML = `
     <div class="habit-card__header">
+      <div class="habit-card__streak">
+        <span class="streak-icon">⚡</span>
+        <span class="streak-number">${habit.currentStreak}</span>
+      </div>
       <div class="habit-card__dots">
         ${daysHtml}
       </div>
@@ -475,7 +518,6 @@ function createHabitCardElement(habit) {
     <div class="habit-card__body">
       <h3 class="habit-card__title">${escapeHtml(habit.name)}</h3>
       <p class="habit-card__duration">${escapeHtml(habit.duration || 'Daily')}</p>
-      ${streakText ? `<p class="habit-card__streak">${streakText}</p>` : ''}
     </div>
   `;
 
