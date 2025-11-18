@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="The Game of Life - Transform your habits into your future self with visual avatar progression">
+  <meta name="theme-color" content="#0f0f0f">
+
+  <title>The Game of Life - Habit Tracker</title>
+
+  <!-- App Icons -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%234a90e2' width='192' height='192'/><text x='50%' y='50%' font-size='120' fill='white' text-anchor='middle' dominant-baseline='middle' font-weight='bold'>⚡</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%234a90e2' width='192' height='192'/><text x='50%' y='50%' font-size='120' fill='white' text-anchor='middle' dominant-baseline='middle' font-weight='bold'>⚡</text></svg>">
+
+  <!-- CSS Files -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app-container">
+    <!-- Main Content Area -->
+    <main id="main-content">
+      <!-- Habits Tab (Home Screen) -->
+      <div id="habits-view" class="view active">
+        <header class="header">
+          <h1>Habits</h1>
+          <button id="add-habit-btn" class="btn-add" aria-label="Add new habit">+</button>
+          <p class="date-indicator" id="date-indicator">November</p>
+        </header>
+        <div id="habits-list" class="habits-list">
+          <!-- Habit cards will be rendered here -->
+        </div>
+      </div>
+
+      <!-- Habit Detail View -->
+      <div id="detail-view" class="view">
+        <header class="header">
+          <button id="back-btn" class="btn-back" aria-label="Go back">←</button>
+          <h1 id="detail-habit-name">Habit Name</h1>
+          <button id="edit-habit-btn" class="btn-edit" aria-label="Edit habit">✎</button>
+        </header>
+        <div id="detail-content" class="detail-content">
+          <!-- Habit detail content will be rendered here -->
+        </div>
+      </div>
+
+      <!-- Avatar Tab -->
+      <div id="avatar-view" class="view">
+        <header class="header">
+          <h1>Avatar</h1>
+        </header>
+        <div id="avatar-content" class="avatar-content">
+          <!-- Avatar slider, progress, and milestones will be rendered here -->
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div id="settings-view" class="view">
+        <header class="header">
+          <h1>Settings</h1>
+        </header>
+        <div class="settings-content">
+          <!-- Theme Toggle -->
+          <section class="settings-section">
+            <h2 class="settings-title">Appearance</h2>
+            <div class="settings-item">
+              <label for="theme-toggle">Theme</label>
+              <button id="theme-toggle" class="btn-toggle" aria-label="Toggle dark/light theme">
+                <span class="toggle-indicator"></span>
+              </button>
+            </div>
+          </section>
+
+          <!-- Data Section -->
+          <section class="settings-section">
+            <h2 class="settings-title">Data</h2>
+            <button id="export-data-btn" class="btn-settings-item">
+              <span>📥</span>
+              <span>Export Data</span>
+              <span>→</span>
+            </button>
+            <button id="clear-data-btn" class="btn-settings-item btn-danger">
+              <span>🗑️</span>
+              <span>Clear All Data</span>
+              <span></span>
+            </button>
+          </section>
+
+          <!-- About Section -->
+          <section class="settings-section">
+            <h2 class="settings-title">About</h2>
+            <div class="settings-item">
+              <span>Version</span>
+              <span class="text-secondary">1.0.0</span>
+            </div>
+            <div class="settings-item">
+              <span>Created by M8</span>
+              <span class="text-secondary">AIMAZE</span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-tab active" data-tab="habits" aria-label="Habits">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Habits</span>
+      </button>
+      <button class="nav-tab" data-tab="avatar" aria-label="Avatar">
+        <span class="nav-icon">🧑</span>
+        <span class="nav-label">Avatar</span>
+      </button>
+      <button class="nav-tab" data-tab="settings" aria-label="Settings">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Settings</span>
+      </button>
+    </nav>
+
+    <!-- Create/Edit Habit Modal -->
+    <div id="habit-modal" class="modal">
+      <div class="modal-content">
+        <header class="modal-header">
+          <h2 id="modal-title">Create Habit</h2>
+          <button id="modal-close-btn" class="btn-close" aria-label="Close modal">×</button>
+        </header>
+
+        <form id="habit-form" class="habit-form">
+          <!-- Habit Name -->
+          <div class="form-group">
+            <label for="habit-name" class="form-label">I want to</label>
+            <input
+              type="text"
+              id="habit-name"
+              class="form-input"
+              placeholder="e.g., Read, Exercise, Meditate"
+              required
+              autocomplete="off"
+            >
+            <span class="form-error" id="name-error"></span>
+          </div>
+
+          <!-- Frequency -->
+          <div class="form-group">
+            <label class="form-label">
+              <span id="frequency-label">times in</span>
+            </label>
+            <div class="frequency-inputs">
+              <input
+                type="number"
+                id="frequency-target"
+                class="form-input input-small"
+                value="1"
+                min="1"
+                max="7"
+              >
+              <select id="frequency-period" class="form-input input-small">
+                <option value="week">week</option>
+                <option value="day">day</option>
+                <option value="month">month</option>
+              </select>
+            </div>
+            <span class="form-error" id="frequency-error"></span>
+          </div>
+
+          <!-- Duration (Optional) -->
+          <div class="form-group collapsible">
+            <button type="button" class="btn-collapsible" id="duration-toggle">
+              Define a smallest unit ▼
+            </button>
+            <div class="collapsible-content hidden">
+              <div class="duration-inputs">
+                <input
+                  type="number"
+                  id="duration-value"
+                  class="form-input input-small"
+                  placeholder="e.g., 2"
+                  min="1"
+                >
+                <input
+                  type="text"
+                  id="duration-unit"
+                  class="form-input input-small"
+                  placeholder="Minutes, Pages, etc."
+                >
+              </div>
+              <p class="form-help">i.e. 2 Minutes</p>
+            </div>
+          </div>
+
+          <!-- Advanced Options -->
+          <div class="form-group collapsible">
+            <button type="button" class="btn-collapsible" id="advanced-toggle">
+              Advanced Options ▼
+            </button>
+            <div class="collapsible-content hidden">
+              <!-- Reminders -->
+              <div class="advanced-section">
+                <label class="form-label">
+                  <input
+                    type="checkbox"
+                    id="reminder-toggle"
+                    class="form-checkbox"
+                  >
+                  Remind me at
+                </label>
+                <div id="reminder-options" class="hidden">
+                  <input
+                    type="time"
+                    id="reminder-time"
+                    class="form-input"
+                  >
+                  <div class="day-selector">
+                    <label class="day-option">
+                      <input type="checkbox" value="monday" class="reminder-day"> Mon
+                    </label>
+                    <label class="day-option">
+                      <input type="checkbox" value="tuesday" class="reminder-day"> Tue
+                    </label>
+                    <label class="day-option">
+                      <input type="checkbox" value="wednesday" class="reminder-day"> Wed
+                    </label>
+                    <label class="day-option">
+                      <input type="checkbox" value="thursday" class="reminder-day"> Thu
+                    </label>
+                    <label class="day-option">
+                      <input type="checkbox" value="friday" class="reminder-day"> Fri
+                    </label>
+                    <label class="day-option">
+                      <input type="checkbox" value="saturday" class="reminder-day"> Sat
+                    </label>
+                    <label class="day-option">
+                      <input type="checkbox" value="sunday" class="reminder-day"> Sun
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Notes -->
+              <div class="advanced-section">
+                <label for="habit-notes" class="form-label">Notes</label>
+                <textarea
+                  id="habit-notes"
+                  class="form-input"
+                  placeholder="Add personal notes..."
+                  maxlength="200"
+                  rows="3"
+                ></textarea>
+                <p class="form-help"><span id="char-count">0</span>/200</p>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary btn-create">CREATE</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div id="confirmation-dialog" class="modal-overlay hidden">
+      <div class="dialog-content">
+        <div class="dialog-icon" id="dialog-icon">⚠️</div>
+        <h2 id="dialog-title">Confirm Action</h2>
+        <p id="dialog-message">Are you sure?</p>
+        <div class="dialog-actions">
+          <button id="dialog-cancel" class="btn-secondary">Cancel</button>
+          <button id="dialog-confirm" class="btn-danger">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Files -->
+  <script src="js/storage.js"></script>
+  <script src="js/habits.js"></script>
+  <script src="js/avatar.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
