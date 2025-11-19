@@ -435,29 +435,29 @@ function submitHabitForm() {
 
   // Create/update habit
   if (appState.editingHabitId) {
-    const habit = getHabitById(appState.editingHabitId);
-    if (habit) {
-      Object.assign(habit, {
-        name: formData.name,
-        duration: formData.duration,
-        frequencyTarget: parseInt(formData.frequencyTarget),
-        frequencyPeriod: formData.frequencyPeriod,
-        notes: formData.notes,
-        reminders: {
-          enabled: formData.reminderEnabled,
-          time: formData.reminderTime,
-          days: formData.reminderDays
-        }
-      });
-      updateHabit(appState.editingHabitId, habit);
-    }
+    // Update existing habit
+    const updates = {
+      name: formData.name,
+      duration: formData.duration,
+      frequencyTarget: parseInt(formData.frequencyTarget),
+      frequencyPeriod: formData.frequencyPeriod,
+      notes: formData.notes,
+      reminders: {
+        enabled: formData.reminderEnabled,
+        time: formData.reminderTime,
+        days: formData.reminderDays
+      }
+    };
+    updateHabit(appState.editingHabitId, updates);
   } else {
+    // Create new habit
     const newHabit = createHabitObject(formData);
     saveNewHabit(newHabit);
   }
 
   // Close modal and refresh
   closeHabitModal();
+  appState.editingHabitId = null; // Clear editing state
   renderHabits();
 
   if (appState.currentHabitDetail) {
@@ -667,7 +667,10 @@ function exportAppData() {
 function clearAllAppData() {
   clearAllData();
   initializeStorage();
-  initializeApp();
+  // Just re-render, don't re-initialize (avoid duplicate event listeners)
+  renderHabits();
+  renderAvatarView();
+  updateDateIndicator();
 }
 
 /**

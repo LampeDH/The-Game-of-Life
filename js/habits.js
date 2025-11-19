@@ -614,6 +614,11 @@ function createHabitCardElement(habit) {
     })
     .join('');
 
+  // Format frequency for display
+  const frequencyText = habit.frequencyTarget === 1 && habit.frequencyPeriod === 'day'
+    ? 'Daily'
+    : `${habit.frequencyTarget} time${habit.frequencyTarget > 1 ? 's' : ''} per ${habit.frequencyPeriod}`;
+
   card.innerHTML = `
     <div class="habit-card__header">
       <div class="habit-card__streak">
@@ -626,7 +631,7 @@ function createHabitCardElement(habit) {
     </div>
     <div class="habit-card__body">
       <h3 class="habit-card__title">${escapeHtml(habit.name)}</h3>
-      <p class="habit-card__duration">${escapeHtml(habit.duration || 'Daily')}</p>
+      <p class="habit-card__duration">${frequencyText}</p>
     </div>
   `;
 
@@ -744,8 +749,3 @@ function escapeHtml(text) {
   };
   return text.replace(/[&<>"']/g, m => map[m]);
 }
-
-// Initialize habits on page load
-document.addEventListener('DOMContentLoaded', () => {
-  renderHabits();
-});
