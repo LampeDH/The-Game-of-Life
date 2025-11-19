@@ -81,7 +81,7 @@
   gap: var(--space-md);
   margin: var(--space-sm) 0 0 0;
   line-height: var(--line-height-heading);
-  padding-right: calc(44px + var(--space-md)); /* Account for + button */
+  padding-right: 0;
   flex-basis: 100%;
 }
 
@@ -95,6 +95,7 @@
   display: flex;
   gap: 14px; /* Same gap as week dots */
   align-items: center;
+  margin-right: calc(-1 * (44px + var(--space-md))); /* Align with card dots */
 }
 
 .header-date-number {
@@ -185,7 +186,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
-  color: var(--text-secondary);
+  color: #808080; /* Grey for inactive */
   transition: all var(--transition-normal);
   font-size: var(--font-small);
   font-weight: var(--font-regular);
@@ -200,8 +201,9 @@
   transform: scale(0.95);
 }
 
+/* Active state - dark mode (default) */
 .nav-tab.active {
-  color: var(--accent);
+  color: #ffffff; /* White in dark mode */
   border-top-color: var(--accent);
   background-color: rgba(74, 144, 226, 0.05);
   font-weight: var(--font-bold);
@@ -211,10 +213,16 @@
   transform: scale(1);
 }
 
+/* Active state - light mode */
+[data-theme="light"] .nav-tab.active {
+  color: #000000; /* Black in light mode */
+}
+
 .nav-icon {
-  font-size: 24px;
+  width: 24px;
+  height: 24px;
   display: block;
-  line-height: 1;
+  stroke-width: 2;
 }
 
 .nav-label {
@@ -499,6 +507,12 @@ button:active {
 .duration-inputs {
   display: flex;
   gap: var(--space-sm);
+  width: 100%;
+}
+
+.duration-inputs .form-input {
+  flex: 1;
+  min-width: 0; /* Allow inputs to shrink below content size */
 }
 
 .day-selector {
