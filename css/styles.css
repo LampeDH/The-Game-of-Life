@@ -141,13 +141,13 @@
 #habits-view .header-dates {
   /* Header has 80px right padding, dots are at 40px from screen edge */
   /* So dates need to extend 40px beyond header's content area */
-  right: -40px;
+  right: -39px; /* Fine-tuned for mobile alignment */
 }
 
 /* Fine-tune alignment for desktop */
 @media (min-width: 768px) {
   #habits-view .header-dates {
-    right: -38px;
+    right: -36px; /* Additional 2px adjustment for desktop */
   }
 }
 
