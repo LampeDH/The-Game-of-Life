@@ -182,13 +182,6 @@ function renderHabitDetail(habitId) {
       </div>
     </div>
 
-    ${habit.notes ? `
-      <div class="habit-notes-section">
-        <h3>Notes</h3>
-        <p>${escapeHtml(habit.notes)}</p>
-      </div>
-    ` : ''}
-
     <div class="calendar-section">
       <h3>Activity</h3>
       <div class="calendar-nav">
@@ -200,6 +193,13 @@ function renderHabitDetail(habitId) {
         <!-- Calendar will be rendered here -->
       </div>
     </div>
+
+    ${habit.notes ? `
+      <div class="habit-notes-section">
+        <h3>Notes</h3>
+        <p>${escapeHtml(habit.notes)}</p>
+      </div>
+    ` : ''}
 
     <div class="detail-footer">
       <button id="delete-habit-btn" class="btn-secondary">Delete Habit</button>

@@ -77,12 +77,13 @@
 .date-indicator {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: var(--space-md);
   margin: var(--space-sm) 0 0 0;
   line-height: var(--line-height-heading);
   padding-right: 0;
   flex-basis: 100%;
+  position: relative;
 }
 
 .header-month {
@@ -95,8 +96,10 @@
   display: flex;
   gap: 14px; /* Same gap as week dots */
   align-items: center;
-  /* Align with habit card dots: screen padding (20px) + card padding (20px) = 40px from screen edge */
-  margin-right: calc(var(--screen-padding) + 20px);
+  flex-direction: row-reverse; /* Match habit card dots order */
+  /* Absolutely position to align exactly with habit card dots */
+  position: absolute;
+  right: 0;
 }
 
 .header-date-number {
@@ -133,6 +136,13 @@
   top: max(var(--space-lg), env(safe-area-inset-top));
   right: var(--screen-padding);
   z-index: 20;
+}
+
+/* Align header dates with habit card dots */
+#habits-view .header-dates {
+  /* Header has 80px right padding, dots are at 40px from screen edge */
+  /* So dates need to extend 40px beyond header's content area */
+  right: -40px;
 }
 
 /* Detail view specific header styling */
