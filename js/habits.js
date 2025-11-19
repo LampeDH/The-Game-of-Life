@@ -676,6 +676,25 @@ function getWeekDateNumbers() {
 }
 
 /**
+ * Get day name abbreviations for the past 7 days
+ * @returns {Array} Array of 2-letter day abbreviations
+ */
+function getWeekDayNames() {
+  const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  const days = [];
+  const today = new Date();
+
+  // Get past 7 days (including today)
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    days.push(dayNames[date.getDay()]);
+  }
+
+  return days;
+}
+
+/**
  * Render all habits to the home screen
  */
 function renderHabits() {
@@ -707,20 +726,29 @@ function renderHabits() {
 }
 
 /**
- * Update header with week date numbers
+ * Update header with week date numbers and day names
  */
 function updateHeaderDates() {
   const dateIndicator = document.getElementById('date-indicator');
   if (!dateIndicator) return;
 
   const weekDates = getWeekDateNumbers();
+  const weekDays = getWeekDayNames();
+
   const datesHtml = weekDates.map(date =>
     `<span class="header-date-number">${date}</span>`
   ).join('');
 
+  const daysHtml = weekDays.map(day =>
+    `<span class="header-day-name">${day}</span>`
+  ).join('');
+
   dateIndicator.innerHTML = `
     <span class="header-month">${getMonthYear()}</span>
-    <div class="header-dates">${datesHtml}</div>
+    <div class="header-dates">
+      <div class="header-dates-row">${datesHtml}</div>
+      <div class="header-days-row">${daysHtml}</div>
+    </div>
   `;
 }
 

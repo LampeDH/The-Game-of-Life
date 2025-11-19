@@ -87,18 +87,31 @@
 }
 
 .header-month {
-  font-size: var(--font-h2);
-  font-weight: var(--font-regular);
-  color: var(--text-secondary);
+  font-size: var(--font-body);
+  font-weight: var(--font-bold);
+  color: var(--text-primary); /* White in dark mode */
 }
 
 .header-dates {
   display: flex;
-  gap: 14px; /* Same gap as week dots */
+  flex-direction: column;
+  gap: 2px; /* Small gap between dates and day names */
   align-items: center;
   /* Absolutely position to align exactly with habit card dots */
   position: absolute;
   right: 0;
+}
+
+.header-dates-row {
+  display: flex;
+  gap: 14px; /* Same gap as week dots */
+  align-items: center;
+}
+
+.header-days-row {
+  display: flex;
+  gap: 14px; /* Same gap as week dots */
+  align-items: center;
 }
 
 .header-date-number {
@@ -106,9 +119,20 @@
   text-align: center;
   font-size: 10px;
   font-weight: var(--font-semibold);
-  color: var(--text-secondary);
+  color: var(--text-primary); /* White in dark mode */
   line-height: 1;
   flex-shrink: 0;
+}
+
+.header-day-name {
+  width: 14px;
+  text-align: center;
+  font-size: 8px;
+  font-weight: var(--font-regular);
+  color: var(--text-primary); /* White in dark mode */
+  line-height: 1;
+  flex-shrink: 0;
+  text-transform: uppercase;
 }
 
 /* Home screen specific header styling */
@@ -268,7 +292,7 @@ button:active {
 .btn-add {
   width: 44px;
   height: 44px;
-  font-size: 28px;
+  font-size: 36px; /* Match Habits h1 size */
   color: var(--accent);
   background: none;
   border-radius: var(--radius-md);
@@ -276,6 +300,7 @@ button:active {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  line-height: 1;
 }
 
 .btn-add:hover {
