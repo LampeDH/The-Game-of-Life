@@ -95,7 +95,8 @@
   display: flex;
   gap: 14px; /* Same gap as week dots */
   align-items: center;
-  margin-right: calc(-1 * (44px + var(--space-md))); /* Align with card dots */
+  /* Align with habit card dots: account for screen padding (20px) + card padding (20px) */
+  padding-right: 20px;
 }
 
 .header-date-number {
@@ -105,6 +106,7 @@
   font-weight: var(--font-semibold);
   color: var(--text-secondary);
   line-height: 1;
+  flex-shrink: 0;
 }
 
 /* Home screen specific header styling */

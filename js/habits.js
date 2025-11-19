@@ -248,31 +248,26 @@ function getWeekNumber(date) {
 
 /**
  * Get days of week with completion status
- * Returns array of objects with day name and completion status
+ * Returns the PAST 7 DAYS (including today)
  * @param {string} habitId - Habit ID
  * @param {Date} refDate - Reference date (default: today)
- * @returns {Array} Array of day objects
+ * @returns {Array} Array of day objects for past 7 days
  */
 function getWeekDays(habitId, refDate = new Date()) {
   const habit = getHabitById(habitId);
   if (!habit) return [];
 
-  // Get Monday of current week
-  const date = new Date(refDate);
-  const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-  const monday = new Date(date.setDate(diff));
-
   const days = [];
-  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const today = new Date(refDate);
 
-  for (let i = 0; i < 7; i++) {
-    const currentDate = new Date(monday);
-    currentDate.setDate(monday.getDate() + i);
+  // Get past 7 days (including today)
+  for (let i = 6; i >= 0; i--) {
+    const currentDate = new Date(today);
+    currentDate.setDate(today.getDate() - i);
     const dateStr = formatDate(currentDate);
 
     days.push({
-      name: dayNames[i],
+      name: getDayName(currentDate),
       date: dateStr,
       completed: habit.completions.includes(dateStr),
       isToday: dateStr === getCurrentDate(),
@@ -281,6 +276,16 @@ function getWeekDays(habitId, refDate = new Date()) {
   }
 
   return days;
+}
+
+/**
+ * Get short day name from date
+ * @param {Date} date - Date object
+ * @returns {string} Short day name (Mon, Tue, etc.)
+ */
+function getDayName(date) {
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return dayNames[date.getDay()];
 }
 
 /**

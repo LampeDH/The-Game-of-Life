@@ -619,17 +619,11 @@ function loadTheme() {
  */
 function toggleTheme() {
   const html = document.documentElement;
-  const currentTheme = html.dataset.theme || 'dark';
+  const currentTheme = html.getAttribute('data-theme') || 'dark';
   const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
   applyTheme(newTheme);
   updateSettings({ theme: newTheme });
-
-  // Update toggle button state
-  const toggle = document.getElementById('theme-toggle');
-  if (toggle) {
-    toggle.classList.toggle('active', newTheme === 'light');
-  }
 }
 
 /**
@@ -638,7 +632,7 @@ function toggleTheme() {
  */
 function applyTheme(theme) {
   const html = document.documentElement;
-  html.dataset.theme = theme;
+  html.setAttribute('data-theme', theme);
   appState.theme = theme;
 
   // Update toggle button state
