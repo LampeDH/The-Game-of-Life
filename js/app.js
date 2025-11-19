@@ -182,6 +182,13 @@ function renderHabitDetail(habitId) {
       </div>
     </div>
 
+    ${habit.notes ? `
+      <div class="habit-notes-section">
+        <h3>Notes</h3>
+        <p>${escapeHtml(habit.notes)}</p>
+      </div>
+    ` : ''}
+
     <div class="calendar-section">
       <h3>Activity</h3>
       <div class="calendar-nav">
@@ -611,6 +618,8 @@ function setupSettings() {
 function loadTheme() {
   const settings = getSettings();
   const theme = settings.theme || 'dark';
+  // Ensure theme is set on HTML element
+  document.documentElement.setAttribute('data-theme', theme);
   applyTheme(theme);
 }
 
