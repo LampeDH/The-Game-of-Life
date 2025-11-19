@@ -156,6 +156,51 @@ function returnToHabits() {
 }
 
 /**
+ * Format goal text for habit detail view
+ * @param {Object} habit - Habit object
+ * @returns {string} Formatted goal text
+ */
+function formatGoalText(habit) {
+  const frequencyText = habit.frequencyTarget === 1 && habit.frequencyPeriod === 'day'
+    ? 'daily'
+    : `${habit.frequencyTarget} time${habit.frequencyTarget > 1 ? 's' : ''} per ${habit.frequencyPeriod}`;
+
+  let goalText = `${habit.name} ${frequencyText}`;
+
+  if (habit.duration) {
+    goalText += ` for ${habit.duration}`;
+  }
+
+  return goalText;
+}
+
+/**
+ * Format reminders text for habit detail view
+ * @param {Object} habit - Habit object
+ * @returns {string} Formatted reminders text
+ */
+function formatRemindersText(habit) {
+  if (!habit.reminders?.enabled) {
+    return 'No reminders';
+  }
+
+  const dayMap = {
+    'monday': 'Mon',
+    'tuesday': 'Tue',
+    'wednesday': 'Wed',
+    'thursday': 'Thu',
+    'friday': 'Fri',
+    'saturday': 'Sat',
+    'sunday': 'Sun'
+  };
+
+  const days = habit.reminders.days?.map(day => dayMap[day] || day).join(', ') || 'No days selected';
+  const time = habit.reminders.time || 'No time set';
+
+  return `${days} at ${time}`;
+}
+
+/**
  * Render habit detail view content
  * @param {string} habitId - Habit ID
  */
@@ -191,6 +236,17 @@ function renderHabitDetail(habitId) {
       </div>
       <div id="calendar-view" class="calendar-grid">
         <!-- Calendar will be rendered here -->
+      </div>
+    </div>
+
+    <div class="habit-info-section">
+      <div class="info-item">
+        <div class="info-label">Goal</div>
+        <div class="info-value">${formatGoalText(habit)}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Reminders</div>
+        <div class="info-value">${formatRemindersText(habit)}</div>
       </div>
     </div>
 
