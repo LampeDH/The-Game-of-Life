@@ -96,7 +96,6 @@
   display: flex;
   gap: 14px; /* Same gap as week dots */
   align-items: center;
-  flex-direction: row-reverse; /* Match habit card dots order */
   /* Absolutely position to align exactly with habit card dots */
   position: absolute;
   right: 0;
@@ -143,6 +142,13 @@
   /* Header has 80px right padding, dots are at 40px from screen edge */
   /* So dates need to extend 40px beyond header's content area */
   right: -40px;
+}
+
+/* Fine-tune alignment for desktop */
+@media (min-width: 768px) {
+  #habits-view .header-dates {
+    right: -38px;
+  }
 }
 
 /* Detail view specific header styling */
