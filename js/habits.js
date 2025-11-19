@@ -684,6 +684,9 @@ function renderHabits() {
 
   if (!container) return;
 
+  // Update header date numbers (always, even if no habits)
+  updateHeaderDates();
+
   container.innerHTML = '';
 
   if (habits.length === 0) {
@@ -701,9 +704,6 @@ function renderHabits() {
     const card = createHabitCardElement(habit);
     container.appendChild(card);
   });
-
-  // Update header date numbers
-  updateHeaderDates();
 }
 
 /**
